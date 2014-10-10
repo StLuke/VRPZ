@@ -5,9 +5,10 @@ import numpy as np #Imports NumPy
 import cv,cv2 #Uses both of cv and cv2
 import pygame #Uses pygame
 import sys
+import socket
 
 
-smoothing = 5 
+smoothing = 5
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
 """
@@ -69,10 +70,13 @@ def in_hull(p, hull):
 
     return hull.find_simplex(p)>=0
 
-"""
-This is the GUI that displays the thresholded image with the convex hull and centroids. It uses pygame.
-Mouse control is also dictated in this function because the mouse commands are updated as the frame is updated
-"""
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(('', 5005))
+s.setblocking(0)
+data =''
+address = ''
+
 def hand_tracker():
     (depth,_) = get_depth()
     centroidList = list() #Initiate centroid list
@@ -93,7 +97,6 @@ def hand_tracker():
     done = False #Iterator boolean --> Tells programw when to terminate
 
 
-
     # HOLY COW!!
     scale = 1.0
     imgCow = pygame.image.load('../graphics/' +sys.argv[1]+'.png')
@@ -104,6 +107,29 @@ def hand_tracker():
 
     
     while not done:
+        try:
+            data,address = s.recvfrom(10000)
+            print "recv:", data, " from:", address
+            if data == "ping":
+                s.sendto("ready", address)
+            if 'ksicht' in data:
+                print "Menim ksicht"
+                imgCow = pygame.image.load('../graphics/' + data.replace('ksicht:', ''))
+                cowW, cowH = imgCow.get_size()
+                imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
+            if 'zbran' in data:
+                print "Menim zbran"
+            if ";" in data:
+                # Suradnice
+                try:
+                    x,y,z = data.split(';')
+                    print x, " ", y, " ", z
+                except Exception as e:
+                    print "Suradnice: ", e
+
+        except Exception as e:
+            pass
+
         screen.fill(BLACK) #Make the window black
         (depth,_) = get_depth() #Get the depth from the kinect
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
@@ -142,7 +168,7 @@ def hand_tracker():
 
 
         maxCont = (0, 1000)
-    
+
         #print tempCont
         for coords in tempCont:
             #print coords
@@ -157,10 +183,10 @@ def hand_tracker():
         for val in smoothVector:
             mean[0] = mean[0]+val[0]
             mean[1] = mean[1]+val[1]
-            
+
         mean[0]=int(mean[0]/len(smoothVector))
         mean[1]=int(mean[1]/len(smoothVector))
-        
+
         xcord = mean[0] - (imgCow.get_rect().size[0]/2)
         ycord = mean[1] - (imgCow.get_rect().size[1]/2)
 
