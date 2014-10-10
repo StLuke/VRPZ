@@ -116,7 +116,7 @@ def hand_tracker():
     cowW, cowH = imgCow.get_size()
     imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
     smoothVector = list()
-    smoothAngel = list()
+    smoothAngle = list()
     maxCont = (0, 1000)
 
     accX = 0
@@ -250,7 +250,7 @@ def hand_tracker():
             angle = 180 - (float(accX))
 
 
-            ## smoothing
+
             smoothAngle.append(angle)
             if len(smoothAngle) > smoothingAngle:
                 smoothAngle.pop(0)
