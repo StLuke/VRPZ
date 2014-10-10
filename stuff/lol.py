@@ -51,6 +51,21 @@ class BlobAnalysis:
         self.contourArea = contourArea
 
 
+def in_hull(p, hull):
+    """
+    Test if points in `p` are in `hull`
+
+    `p` should be a `NxK` coordinates of `N` points in `K` dimension
+    `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the 
+    coordinates of `M` points in `K`dimension for which a Delaunay triangulation
+    will be computed
+    """
+    from scipy.spatial import Delaunay
+    if not isinstance(hull,Delaunay):
+        hull = Delaunay(hull)
+
+    return hull.find_simplex(p)>=0
+
 """
 This is the GUI that displays the thresholded image with the convex hull and centroids. It uses pygame.
 Mouse control is also dictated in this function because the mouse commands are updated as the frame is updated
@@ -82,25 +97,42 @@ def hand_tracker():
     cowW, cowH = imgCow.get_size()
     imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
 
+    maxCont = (0, 1000)
 
 
     while not done:
         screen.fill(BLACK) #Make the window black
         (depth,_) = get_depth() #Get the depth from the kinect
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
-        _,depthThresh = cv2.threshold(depth, 600, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
+        _,depthThresh = cv2.threshold(depth, 700, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
         _,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
         blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
 
-        maxCont = (0, 1000)
+        lastCont = maxCont
+        #maxCont = (0, 1000)
 
         for cont in blobDataBack.contours: #Iterates through contours in the background
             pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
 
+
+            tempMax = (0, 1000)
             for xcont,ycont in cont:
-                if ycont < maxCont[1]:
-                    maxCont = (xcont, ycont)
+                if ycont < tempMax[1]:
+                    tempMax = (xcont, ycont)
+
+                    itsHand = False
+                    for i in range(blobData.counter):
+                        if in_hull((tempMax[0], tempMax[1]), blobData.cHull[i]):
+                            itsHand = True
+
+                    if not itsHand:
+                        #if tempMax[1] < maxCont[1]:
+                        maxCont = (xcont, ycont)
+
+        if maxCont == (0, 1000):
+            maxCont = lastCont
+            pass
 
         xcord = maxCont[0] - (imgCow.get_rect().size[0]/2)
         ycord = maxCont[1] - (imgCow.get_rect().size[1]/2)
@@ -120,7 +152,7 @@ def hand_tracker():
 
             # Body ruky
             for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
-                #pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
+                pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
 
                 if tips[0] < mostLeft[0]:
                     mostLeft = tips
