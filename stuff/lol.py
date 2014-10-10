@@ -9,7 +9,7 @@ import socket
 
 
 smoothing = 5
-smoothingAngle = 5
+smoothingAngle = 10
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
 
@@ -123,6 +123,7 @@ def hand_tracker():
     accY = 0
     accZ = 0
 
+    head = [0, 10000]
 
     pygame.mixer.init()
     sound = pygame.mixer.Sound('../graphics/' + sys.argv[1]+'.wav')
@@ -217,6 +218,7 @@ def hand_tracker():
         xcord = mean[0] - (imgCow.get_rect().size[0]/2)
         ycord = mean[1] - (imgCow.get_rect().size[1]/2)
 
+        headCords = [xcord, ycord]
         # Hlava?
         screen.blit(imgCow, (xcord, ycord+65))
 
@@ -239,6 +241,9 @@ def hand_tracker():
                 if tips[0] > mostRight[0]:
                     mostRight = tips
 
+
+            if blobData.centroid[i][0] > headCords[0]:
+                continue
             # Centrum ruky
             pygame.draw.circle(screen,WHITE,blobData.centroid[i],10)
             imgZbran = pygame.image.load('../graphics/' + zbran)
