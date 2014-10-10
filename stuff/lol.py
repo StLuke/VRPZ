@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from freenect import sync_get_depth as get_depth #Uses freenect to get depth information from the Kinect
 import numpy as np #Imports NumPy
 import cv,cv2 #Uses both of cv and cv2
@@ -84,12 +86,13 @@ def cacheAppendMean(cache, val):
     del cache[0]
     return np.mean(cache)
 
-UDP_IP = "127.0.0.1"
+UDP_IP = "0.0.0.0"
 UDP_PORT = 5005
 
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
-#sock.bind((UDP_IP, UDP_PORT))
+sock.bind((UDP_IP, UDP_PORT))
+sock.setblocking(0)
 
 #while True:
 #    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
@@ -121,6 +124,17 @@ def hand_tracker():
     screen.fill(BLACK) #Make the window black
     done = False #Iterator boolean --> Tells programw when to terminate
     dummy = False #Very important bool for mouse manipulation
+
+
+
+    # HOLY COW!!
+    scale = 0.8
+    imgCow = pygame.image.load('../graphics/cow.png')
+    cowW, cowH = imgCow.get_size()
+    imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
+
+
+
     while not done:
         screen.fill(BLACK) #Make the window black
         (depth,_) = get_depth() #Get the depth from the kinect
@@ -130,14 +144,27 @@ def hand_tracker():
         blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
 
+        maxCont = (0, 1000)
+
         for cont in blobDataBack.contours: #Iterates through contours in the background
             pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
+            for xcont,ycont in cont:
+                if ycont < maxCont[1]:
+                    maxCont = (xcont, ycont)
+
+        xcord = maxCont[0] - (imgCow.get_rect().size[0]/2)
+        ycord = maxCont[1] - (imgCow.get_rect().size[1]/2)
+
+        screen.blit(imgCow, (xcord, ycord+100))
+
 
         """ SVG
         data = array.array('c', chr(0) * WIDTH * HEIGHT * 4)
         surface = cairo.ImageSurface.create_for_data(
             data, cairo.FORMAT_ARGB32, WIDTH, HEIGHT, WIDTH * 4)
         """
+
+
 
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
 
@@ -156,44 +183,10 @@ def hand_tracker():
                 if tips[0] > mostRight[0]:
                     mostRight = tips
 
-            # HOLY COW!!
-            scale = 0.8
-            imgCow = pygame.image.load('../graphics/cow.png')
-            cowW, cowH = imgCow.get_size()
-            imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
-            xcord = blobData.centroid[i][0] - (imgCow.get_rect().size[0]/2)
-            ycord = blobData.centroid[i][1] - (imgCow.get_rect().size[1]/2)
-
-            # Cow hands
-            pygame.draw.circle(screen,WHITE,mostLeft,30) #Draws the vertices purple
-            pygame.draw.circle(screen,WHITE,mostRight,30) #Draws the vertices purple
-
-            """
-            centerHandCord = (xcord, ycord - 200)
-            hand = pygame.image.load('../graphics/cow-hand.png')
-
-            deltaX = centerHandCord[0] - mostLeft[0]
-            deltaY = centerHandCord[1] - mostLeft[1]
-            PI = 3.14
-
-            try:
-                angleInDegrees = np.arctan(deltaY / deltaX) * 180 / PI
-                hand = pygame.transform.rotate(hand, angleInDegrees)
-                screen.blit(hand, (xcord, ycord))
-            except:
-                pass
-            """
-
-
-
-
-            # Cow body
-            screen.blit(imgCow, (xcord, ycord))
+            pygame.draw.circle(screen,WHITE,blobData.centroid[i],30)
 
             #print blobData.centroid[i]
 
-            # One cow only!
-            break
 
 
             """ SVG stuff
