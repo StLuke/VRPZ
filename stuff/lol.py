@@ -123,7 +123,7 @@ def hand_tracker():
                 cowW, cowH = imgCow.get_size()
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
 
-                sound = pygame.mixer.Sound('../graphics/' + data.replace('ksicht:', '').replace('.png','.wav')
+                sound = pygame.mixer.Sound('../graphics/' + data.replace('ksicht:', '').replace('.png','.wav'))
                 sound.set_volume(1.0)
                 sound.play()
 
