@@ -6,6 +6,8 @@ import cv,cv2 #Uses both of cv and cv2
 import pygame #Uses pygame
 import sys
 
+
+smoothing = 5 
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
 """
@@ -97,16 +99,16 @@ def hand_tracker():
     imgCow = pygame.image.load('../graphics/' +sys.argv[1]+'.png')
     cowW, cowH = imgCow.get_size()
     imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
-
+    smoothVector = list()
     maxCont = (0, 1000)
 
-
+    
     while not done:
         screen.fill(BLACK) #Make the window black
         (depth,_) = get_depth() #Get the depth from the kinect
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
-        _,depthThresh = cv2.threshold(depth, 850, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
-        _,back = cv2.threshold(depth, 950, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
+        _,depthThresh = cv2.threshold(depth, 650, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
+        _,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
         blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
 
@@ -140,31 +142,44 @@ def hand_tracker():
 
 
         maxCont = (0, 1000)
+    
         #print tempCont
         for coords in tempCont:
             #print coords
             if coords[1] < maxCont[1]:
                 maxCont = coords
 
-        xcord = maxCont[0] - (imgCow.get_rect().size[0]/2)
-        ycord = maxCont[1] - (imgCow.get_rect().size[1]/2)
+        smoothVector.append(maxCont)
+        if len(smoothVector) > smoothing:
+            smoothVector.pop(0)
+
+        mean = [0, 0]
+        for val in smoothVector:
+            mean[0] = mean[0]+val[0]
+            mean[1] = mean[1]+val[1]
+            
+        mean[0]=int(mean[0]/len(smoothVector))
+        mean[1]=int(mean[1]/len(smoothVector))
+        
+        xcord = mean[0] - (imgCow.get_rect().size[0]/2)
+        ycord = mean[1] - (imgCow.get_rect().size[1]/2)
 
         # Hlava?
-        screen.blit(imgCow, (xcord, ycord+50))
+        screen.blit(imgCow, (xcord, ycord+65))
 
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
 
-            pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
+            #pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
 
             centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
-            pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
+            #pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
             pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
             mostLeft = (xSize, 0)
             mostRight = (0, 0)
 
             # Body ruky
             for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
-                pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
+                #pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
 
                 if tips[0] < mostLeft[0]:
                     mostLeft = tips
