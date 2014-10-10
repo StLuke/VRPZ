@@ -11,6 +11,7 @@ import socket
 smoothing = 5
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
+
 """
 This class is a less extensive form of regionprops() developed by MATLAB. It finds properties of contours and sets them to fields
 """
@@ -60,7 +61,7 @@ def in_hull(p, hull):
     Test if points in `p` are in `hull`
 
     `p` should be a `NxK` coordinates of `N` points in `K` dimension
-    `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the 
+    `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the
     coordinates of `M` points in `K`dimension for which a Delaunay triangulation
     will be computed
     """
@@ -105,7 +106,11 @@ def hand_tracker():
     smoothVector = list()
     maxCont = (0, 1000)
 
-    
+    pygame.mixer.init()
+    sound = pygame.mixer.Sound('../graphics/' + sys.argv[1]+'.wav')
+    sound.set_volume(1.0)
+    sound.play()
+
     while not done:
         try:
             data,address = s.recvfrom(10000)
@@ -117,6 +122,11 @@ def hand_tracker():
                 imgCow = pygame.image.load('../graphics/' + data.replace('ksicht:', ''))
                 cowW, cowH = imgCow.get_size()
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
+
+                sound = pygame.mixer.Sound('../graphics/' + data.replace('ksicht:', '').replace('.png','.wav')
+                sound.set_volume(1.0)
+                sound.play()
+
             if 'zbran' in data:
                 print "Menim zbran"
             if ";" in data:
