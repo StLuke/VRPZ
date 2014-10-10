@@ -10,6 +10,7 @@ class IdleScreen():
 		self.scrWidth = self.screen.get_rect().width
 		self.scrHeight = self.screen.get_rect().height
 		self.bgColor = (0, 0, 0)
+		self.bgImage = pygame.image.load("mainbg.jpg").convert()
 		self.clock = pygame.time.Clock()
 		self.font = pygame.font.SysFont("Comic Sans MS", 50)
 		self.fontColor = (255, 255, 255)
@@ -37,8 +38,8 @@ class IdleScreen():
 				if e.type == pygame.QUIT:
 					screenloop = False
 
-			self.screen.fill(self.bgColor)
-
+			#self.screen.fill(self.bgColor)
+			self.screen.blit(self.bgImage, (0, 0))
 			# Draw menu
 			self.drawMenu()
 			pygame.display.flip()
