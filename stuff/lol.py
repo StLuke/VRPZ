@@ -70,12 +70,22 @@ def in_hull(p, hull):
 
     return hull.find_simplex(p)>=0
 
+def rot_center(image, angle):
+    """rotate an image while keeping its center and size"""
+    orig_rect = image.get_rect()
+    rot_image = pygame.transform.rotate(image, angle)
+    rot_rect = orig_rect.copy()
+    rot_rect.center = rot_image.get_rect().center
+    rot_image = rot_image.subsurface(rot_rect).copy()
+    return rot_image
+
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(('', 5005))
 s.setblocking(0)
 data =''
 address = ''
+
 
 def hand_tracker():
     (depth,_) = get_depth()
@@ -98,6 +108,7 @@ def hand_tracker():
 
 
     # HOLY COW!!
+    zbran = 'lightsaber.png'
     scale = 1.0
     imgCow = pygame.image.load('../graphics/' +sys.argv[1]+'.png')
     cowW, cowH = imgCow.get_size()
@@ -105,6 +116,11 @@ def hand_tracker():
     smoothVector = list()
     maxCont = (0, 1000)
 
+    accX = 0
+    accY = 0
+    accZ = 0
+
+    tmp = 0
     
     while not done:
         try:
@@ -119,11 +135,11 @@ def hand_tracker():
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
             if 'zbran' in data:
                 print "Menim zbran"
+                zbran = data.replace('zbran:', '')
             if ";" in data:
                 # Suradnice
                 try:
-                    x,y,z = data.split(';')
-                    print x, " ", y, " ", z
+                    accX,accY,accZ = data.split(';')
                 except Exception as e:
                     print "Suradnice: ", e
 
@@ -199,7 +215,7 @@ def hand_tracker():
 
             centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
             #pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
-            pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
+            #pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
             mostLeft = (xSize, 0)
             mostRight = (0, 0)
 
@@ -213,7 +229,17 @@ def hand_tracker():
                     mostRight = tips
 
             # Centrum ruky
-            pygame.draw.circle(screen,WHITE,blobData.centroid[i],30)
+            pygame.draw.circle(screen,WHITE,blobData.centroid[i],10)
+            imgZbran = pygame.image.load('../graphics/' + zbran)
+            zbranW, zbranH = imgZbran.get_size()
+
+            #old_center = imgZbran.get_rect().center
+            #imgZbran = pygame.transform.rotate(imgZbran, (float(accX) + 90) * -1)
+            #imgZbran = pygame.transform.rotate(imgZbran, tmp)
+            imgZbran = rot_center(imgZbran, 180 - (float(accX)))
+            #imgZbran.get_rect().center = old_center
+
+            screen.blit(imgZbran, (blobData.centroid[i][0] - int(zbranW/2), blobData.centroid[i][1] - int(zbranH/2)))
 
         pygame.display.set_caption('ZOO') #Makes the caption of the pygame screen 'Kinect Tracking'
         del depth #Deletes depth --> opencv memory issue
