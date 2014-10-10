@@ -9,6 +9,10 @@ import Xlib.XK
 import Xlib.error
 import Xlib.ext.xtest
 
+import rsvg
+import cairo
+import array
+
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
 """
@@ -56,16 +60,19 @@ class BlobAnalysis:
 
 d = display.Display() #Display reference for Xlib manipulation
 def move_mouse(x,y):#Moves the mouse to (x,y). x and y are ints
+    return
     s = d.screen()
     root = s.root
     root.warp_pointer(x,y)
     d.sync()
-    
+
 def click_down(button):#Simulates a down click. Button is an int
+    return
     Xlib.ext.xtest.fake_input(d,X.ButtonPress, button)
     d.sync()
-    
+
 def click_up(button): #Simulates a up click. Button is an int
+    return
     Xlib.ext.xtest.fake_input(d,X.ButtonRelease, button)
     d.sync()
 
@@ -98,7 +105,8 @@ def hand_tracker():
     WHITE = (255,255,255)
     YELLOW = (255,255,0)
     pygame.init() #Initiates pygame
-    xSize,ySize = 640,480 #Sets size of window
+    xSize,ySize = 1024,768 #Sets size of window
+    WIDTH,HEIGHT = xSize,ySize
     screen = pygame.display.set_mode((xSize,ySize),pygame.RESIZABLE) #creates main surface
     screenFlipped = pygame.display.set_mode((xSize,ySize),pygame.RESIZABLE) #creates surface that will be flipped (mirror display)
     screen.fill(BLACK) #Make the window black
@@ -106,23 +114,48 @@ def hand_tracker():
     dummy = False #Very important bool for mouse manipulation
     while not done:
         screen.fill(BLACK) #Make the window black
-        (depth,_) = get_depth() #Get the depth from the kinect 
+        (depth,_) = get_depth() #Get the depth from the kinect
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
         _,depthThresh = cv2.threshold(depth, 600, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
         _,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
         blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
-        
+
         for cont in blobDataBack.contours: #Iterates through contours in the background
             pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
+
+        """ SVG
+        data = array.array('c', chr(0) * WIDTH * HEIGHT * 4)
+        surface = cairo.ImageSurface.create_for_data(
+            data, cairo.FORMAT_ARGB32, WIDTH, HEIGHT, WIDTH * 4)
+        """
+
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
             pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
+
+            # HOLY COW!!
+            img = pygame.image.load('../graphics/cow.png')
+            xcord = blobData.centroid[i][0] - (img.get_rect().size[0]/2)
+            ycord = blobData.centroid[i][1] - (img.get_rect().size[1]/2)
+            screen.blit(img, (xcord, ycord))
+            print img.get_rect().size
+
+
+            """ SVG stuff
+            svg = rsvg.Handle(file="../graphics/cow.svg")
+            ctx = cairo.Context(surface)
+            svg.render_cairo(ctx)
+            image = pygame.image.frombuffer(data.tostring(), (WIDTH, HEIGHT),"ARGB")
+            screen.blit(image, blobData.centroid[i])
+            """
+
+
             centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
             pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
             pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
             for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
                 pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
-        
+
         """
         #Drawing Loop
         #This draws on the screen lines from the centroids
@@ -130,13 +163,13 @@ def hand_tracker():
         for cent in centroidList:
             pygame.draw.circle(screen,BLUE,cent,10)
         """
-        
-        pygame.display.set_caption('Kinect Tracking') #Makes the caption of the pygame screen 'Kinect Tracking'
+
+        pygame.display.set_caption('ZOO') #Makes the caption of the pygame screen 'Kinect Tracking'
         del depth #Deletes depth --> opencv memory issue
         screenFlipped = pygame.transform.flip(screen,1,0) #Flips the screen so that it is a mirror display
         screen.blit(screenFlipped,(0,0)) #Updates the main screen --> screen
         pygame.display.flip() #Updates everything on the window
-        
+
         #Mouse Try statement
         try:
             centroidX = blobData.centroid[0][0]
@@ -164,7 +197,7 @@ def hand_tracker():
                 dummy = True #Lets the function continue to the first part of the if statement
         except: #There may be no centroids and therefore blobData.centroid[0] will be out of range
             dummy = False #Waits for a new starting point
-            
+
         for e in pygame.event.get(): #Itertates through current events
             if e.type is pygame.QUIT: #If the close button is pressed, the while loop ends
                 done = True
