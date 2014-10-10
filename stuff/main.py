@@ -5,10 +5,28 @@ import pygame
 pygame.init()
 
 class IdleScreen():
-	def __init__(self, screen, bgc = (0, 0, 0)):
+	def __init__(self, screen):
 		self.screen = screen
-		self.bgc = bgc
+		self.scrWidth = self.screen.get_rect().width
+		self.scrHeight = self.screen.get_rect().height
+		self.bgColor = (0, 0, 0)
 		self.clock = pygame.time.Clock()
+		self.font = pygame.font.SysFont("Comic Sans MS", 50)
+		self.fontColor = (255, 255, 255)
+		self.menuItems = ("New game", "Exit")
+
+	def drawMenu(self):
+		self.items = []
+
+		for index, item in enumerate(self.menuItems):
+			label = self.font.render(item, 1, self.fontColor)
+			width = label.get_rect().width
+			height = label.get_rect().height
+			posx = (self.scrWidth / 2) - (width / 2)
+			totalHeight  = len(self.menuItems) * height
+			posy = (self.scrHeight / 2) - (totalHeight / 2) + (index * height + 50)
+
+			self.screen.blit(label, (posx, posy))
 
 	def run(self):
 		screenloop = True
@@ -19,8 +37,13 @@ class IdleScreen():
 				if e.type == pygame.QUIT:
 					screenloop = False
 
-			self.screen.fill(self.bgc)
+			self.screen.fill(self.bgColor)
+
+			# Draw menu
+			self.drawMenu()
 			pygame.display.flip()
+
+
 
 if __name__ == "__main__":
 	screen = pygame.display.set_mode((1024, 768), 0, 32)
