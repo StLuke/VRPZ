@@ -9,6 +9,7 @@ import socket
 
 
 smoothing = 5
+smoothingAngle = 5
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
 
@@ -115,6 +116,7 @@ def hand_tracker():
     cowW, cowH = imgCow.get_size()
     imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
     smoothVector = list()
+    smoothAngel = list()
     maxCont = (0, 1000)
 
     accX = 0
@@ -245,7 +247,22 @@ def hand_tracker():
             #old_center = imgZbran.get_rect().center
             #imgZbran = pygame.transform.rotate(imgZbran, (float(accX) + 90) * -1)
             #imgZbran = pygame.transform.rotate(imgZbran, tmp)
-            imgZbran = rot_center(imgZbran, 180 - (float(accX)))
+            angle = 180 - (float(accX))
+
+
+            ## smoothing
+            smoothAngle.append(angle)
+            if len(smoothAngle) > smoothingAngle:
+                smoothAngle.pop(0)
+
+            meanAngle = 0
+            for val in smoothAngle:
+                meanAngle = meanAngle+val
+
+            meanAngle=int(meanAngle/len(smoothAngle))
+
+
+            imgZbran = rot_center(imgZbran, meanAngle)
             #imgZbran.get_rect().center = old_center
 
             screen.blit(imgZbran, (blobData.centroid[i][0] - int(zbranW/2), blobData.centroid[i][1] - int(zbranH/2)))
