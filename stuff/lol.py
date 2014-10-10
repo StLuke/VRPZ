@@ -110,23 +110,23 @@ def hand_tracker():
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
 
         lastCont = maxCont
-        #maxCont = (0, 1000)
+        maxCont = (0, 1000)
 
         for cont in blobDataBack.contours: #Iterates through contours in the background
             pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
-
+    
 
             tempMax = (0, 1000)
             for xcont,ycont in cont:
+                tempMax = maxCont
                 if ycont < tempMax[1]:
                     tempMax = (xcont, ycont)
 
-                    itsHand = False
                     for i in range(blobData.counter):
                         if in_hull((tempMax[0], tempMax[1]), blobData.cHull[i]):
-                            itsHand = True
-
-                    if not itsHand:
+                            tempMax=maxCont
+                            break
+                    else:
                         #if tempMax[1] < maxCont[1]:
                         maxCont = (xcont, ycont)
 
