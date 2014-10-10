@@ -2,6 +2,7 @@
 
 import pygame
 import sys
+import time
 
 pygame.init()
 
@@ -15,7 +16,7 @@ class MenuItem(pygame.font.Font):
 		self.font = font
 		self.fontColor = fontColor
 		self.label = self.font.render(name, 1, self.fontColor)
-		self.itemImage = pygame.image.load("menuico.png").convert()
+		self.itemImage = pygame.image.load("../graphics/menuico.png").convert()
 		self.itemImage.set_colorkey((255, 255, 255))
 
 	def getName(self):
@@ -51,7 +52,7 @@ class IdleScreen():
 		self.scrWidth = self.screen.get_rect().width
 		self.scrHeight = self.screen.get_rect().height
 		self.bgColor = (0, 0, 0)
-		self.bgImage = pygame.image.load("mainbg.jpg").convert()
+		self.bgImage = pygame.image.load("../graphics/mainbg.jpg").convert()
 		self.clock = pygame.time.Clock()
 		self.font = pygame.font.SysFont("Comic Sans MS", 50)
 		self.fontColor = (255, 255, 255)
@@ -81,8 +82,10 @@ class IdleScreen():
 	def run(self):
 		screenloop = True
 		while screenloop:
-			self.clock.tick(50)
+			self.clock.tick(25)
 			mpos = pygame.mouse.get_pos() 
+
+			self.drawMenu()
 
 			for e in pygame.event.get():
 				if e.type == pygame.QUIT:
@@ -91,6 +94,7 @@ class IdleScreen():
 					for item in self.menuItems:
 						if item.isMouseSelect(mpos):
 							self.menuFuncs[item.name]()
+							break;
 
 			self.screen.blit(self.bgImage, (0, 0))
 
@@ -102,7 +106,6 @@ class IdleScreen():
 
 				self.screen.blit(item.label, (item.xpos, item.ypos))
 
-			self.drawMenu()
 			pygame.display.flip()
 
 if __name__ == "__main__":
