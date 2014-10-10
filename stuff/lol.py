@@ -8,10 +8,7 @@ from Xlib import X, display
 import Xlib.XK
 import Xlib.error
 import Xlib.ext.xtest
-
-import rsvg
-import cairo
-import array
+import socket
 
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
@@ -87,6 +84,18 @@ def cacheAppendMean(cache, val):
     del cache[0]
     return np.mean(cache)
 
+UDP_IP = "127.0.0.1"
+UDP_PORT = 5005
+
+sock = socket.socket(socket.AF_INET, # Internet
+                     socket.SOCK_DGRAM) # UDP
+#sock.bind((UDP_IP, UDP_PORT))
+
+#while True:
+#    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+#    print "received message:", data
+
+
 """
 This is the GUI that displays the thresholded image with the convex hull and centroids. It uses pygame.
 Mouse control is also dictated in this function because the mouse commands are updated as the frame is updated
@@ -131,14 +140,60 @@ def hand_tracker():
         """
 
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
+
             pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
 
+            centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
+            #pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
+            #pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
+            mostLeft = (xSize, 0)
+            mostRight = (0, 0)
+            for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
+                #pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
+
+                if tips[0] < mostLeft[0]:
+                    mostLeft = tips
+                if tips[0] > mostRight[0]:
+                    mostRight = tips
+
             # HOLY COW!!
-            img = pygame.image.load('../graphics/cow.png')
-            xcord = blobData.centroid[i][0] - (img.get_rect().size[0]/2)
-            ycord = blobData.centroid[i][1] - (img.get_rect().size[1]/2)
-            screen.blit(img, (xcord, ycord))
-            print img.get_rect().size
+            scale = 0.8
+            imgCow = pygame.image.load('../graphics/cow.png')
+            cowW, cowH = imgCow.get_size()
+            imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
+            xcord = blobData.centroid[i][0] - (imgCow.get_rect().size[0]/2)
+            ycord = blobData.centroid[i][1] - (imgCow.get_rect().size[1]/2)
+
+            # Cow hands
+            pygame.draw.circle(screen,WHITE,mostLeft,30) #Draws the vertices purple
+            pygame.draw.circle(screen,WHITE,mostRight,30) #Draws the vertices purple
+
+            """
+            centerHandCord = (xcord, ycord - 200)
+            hand = pygame.image.load('../graphics/cow-hand.png')
+
+            deltaX = centerHandCord[0] - mostLeft[0]
+            deltaY = centerHandCord[1] - mostLeft[1]
+            PI = 3.14
+
+            try:
+                angleInDegrees = np.arctan(deltaY / deltaX) * 180 / PI
+                hand = pygame.transform.rotate(hand, angleInDegrees)
+                screen.blit(hand, (xcord, ycord))
+            except:
+                pass
+            """
+
+
+
+
+            # Cow body
+            screen.blit(imgCow, (xcord, ycord))
+
+            #print blobData.centroid[i]
+
+            # One cow only!
+            break
 
 
             """ SVG stuff
@@ -149,12 +204,6 @@ def hand_tracker():
             screen.blit(image, blobData.centroid[i])
             """
 
-
-            centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
-            pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
-            pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
-            for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
-                pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
 
         """
         #Drawing Loop
@@ -203,6 +252,9 @@ def hand_tracker():
                 done = True
 
 try: #Kinect may not be plugged in --> weird erros
-    hand_tracker()
+    #hand_tracker()
+    pass
 except: #Lets the libfreenect errors be shown instead of python ones
     pass
+
+hand_tracker()
