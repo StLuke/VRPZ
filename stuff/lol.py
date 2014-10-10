@@ -119,6 +119,8 @@ def hand_tracker():
     smoothAngle = list()
     maxCont = (0, 1000)
 
+    wall = pygame.image.load('../graphics/wall.jpg')
+
     accX = 0
     accY = 0
     accZ = 0
@@ -159,6 +161,7 @@ def hand_tracker():
             pass
 
         screen.fill(BLACK) #Make the window black
+        screen.blit(wall, (0, 0))
         (depth,_) = get_depth() #Get the depth from the kinect
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
         _,depthThresh = cv2.threshold(depth, 650, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
