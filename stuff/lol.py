@@ -109,30 +109,41 @@ def hand_tracker():
         blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
 
-        lastCont = maxCont
-        #maxCont = (0, 1000)
+        # Boundaries
+        hullBound = []
+        for i in range(blobData.counter):
+            hullLeft = 1000
+            hullRight = 0
+            for x,y in blobData.cHull[i]:
+                if x < hullLeft:
+                    hullLeft = x
+                if x > hullRight:
+                    hullRight = x
+            hullBound.append([hullRight, hullLeft])
 
+
+        tempCont = []
         for cont in blobDataBack.contours: #Iterates through contours in the background
             pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
 
-
-            tempMax = (0, 1000)
             for xcont,ycont in cont:
-                if ycont < tempMax[1]:
-                    tempMax = (xcont, ycont)
+                valid = True
+                for bound in hullBound:
+                    if xcont <= bound[0] and xcont >= bound[1]:
+                        # in Hull boundaries
+                        valid = False
+                if valid:
+                    tempCont.append([xcont, ycont])
 
-                    itsHand = False
-                    for i in range(blobData.counter):
-                        if in_hull((tempMax[0], tempMax[1]), blobData.cHull[i]):
-                            itsHand = True
 
-                    if not itsHand:
-                        #if tempMax[1] < maxCont[1]:
-                        maxCont = (xcont, ycont)
 
-        if maxCont == (0, 1000):
-            maxCont = lastCont
-            pass
+
+        maxCont = (0, 1000)
+        #print tempCont
+        for coords in tempCont:
+            #print coords
+            if coords[1] < maxCont[1]:
+                maxCont = coords
 
         xcord = maxCont[0] - (imgCow.get_rect().size[0]/2)
         ycord = maxCont[1] - (imgCow.get_rect().size[1]/2)
