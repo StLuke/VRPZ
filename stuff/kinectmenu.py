@@ -114,7 +114,7 @@ class IdleScreen():
 	# This should somehow start new game with lol.py script - SHOULD, but it doesn't
 	def startNewGame(self):
 		print "newgame"
-		sys.exit(5005)
+		sys.exit(128)
 
 	# Main loop of this script
 	def run(self):
@@ -207,7 +207,7 @@ class IdleScreen():
 					dX = centroidX - strX 
 					# Finds the change in Y
 					dY = strY - centroidY 
-					minChange = 2
+					minChange = 3
 					# If there was a change in X greater than minChange...
 					if abs(dX) > minChange:
 						# New X coordinate of mouse
@@ -334,7 +334,7 @@ d = display.Display()
 
 # Moves the mouse to (x,y). x and y are ints
 def move_mouse(x,y):
-	print "Moving mouse to: ", x, y
+	print "Moving mouse to:", x, y
 	s = d.screen()
 	root = s.root
 	root.warp_pointer(x,y)
