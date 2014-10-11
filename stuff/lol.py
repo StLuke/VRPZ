@@ -22,7 +22,7 @@ movechanceBad = 0.7
 movespeed = 6
 #chance of junk food
 movespeedBad = 12
-head = 'sheep'
+zbran = 'sheep'
 
 """
 This class is a less extensive form of regionprops() developed by MATLAB. It finds properties of contours and sets them to fields
@@ -373,7 +373,7 @@ def hand_tracker():
 
             screen.blit(imgZbran, (blobData.centroid[i][0] - int(zbranW/2), blobData.centroid[i][1] - int(zbranH/2)))
 
-            if headPic != 'sheep':
+            if zbran != 'sheep':
                 for brick in range(len(movingObjectBad)):
                     if distance(movingObjectBad[brick][0], movingObjectBad[brick][1], blobData.centroid[i][0]-80, blobData.centroid[i][1]-80) < 150:
                         movingObjectBad.remove(movingObjectBad[brick])
