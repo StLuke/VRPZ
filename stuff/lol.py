@@ -110,7 +110,7 @@ def hand_tracker():
 
 
     # HOLY COW!!
-    zbran = 'lightsaber.png'
+    zbran = sys.argv[1]+'_weapon.png'
     scale = 1.0
     imgCow = pygame.image.load('../graphics/' +sys.argv[1]+'.png')
     cowW, cowH = imgCow.get_size()
@@ -119,7 +119,7 @@ def hand_tracker():
     smoothAngle = list()
     maxCont = (0, 1000)
 
-    wall = pygame.image.load('../graphics/wall.jpg')
+    wall = pygame.image.load('../graphics/background.jpg')
 
     accX = 0
     accY = 0
@@ -142,8 +142,8 @@ def hand_tracker():
                 imgCow = pygame.image.load('../graphics/' + data.replace('ksicht:', ''))
                 cowW, cowH = imgCow.get_size()
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
-
-                sound = pygame.mixer.Sound('../graphics/' + data.replace('ksicht:', '').replace('.png','.wav'))
+                zbran = data.replace('ksicht:'. '').replace('.png','') + '_weapon.png'
+                sound = pygame.mixer.Sound('../sound/' + data.replace('ksicht:', '').replace('.png','.wav'))
                 sound.set_volume(1.0)
                 sound.play()
 
