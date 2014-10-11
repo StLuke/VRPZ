@@ -3,10 +3,7 @@
 import pygame
 import sys
 import random
-import time
-import threading
 
-from kmouse.py import hand_tracker
 pygame.init()
 
 class BouncingSprite(pygame.sprite.Sprite):
@@ -107,14 +104,8 @@ class IdleScreen():
 		print "THERE SHOULD BE SOMETHING"
 
 	def run(self):
-		thread = None
-		screenloop = True
 		self.buildMenu()
-
-		t = threading.Thread(target=hand_tracker, args=self.screen)
-		t.daemon = True
-		t.start()
-
+		screenloop = True
 		while screenloop:
 			self.clock.tick(30)
 			mpos = pygame.mouse.get_pos() 
@@ -155,11 +146,6 @@ class IdleScreen():
 		for img in self.animalImgs:
 			img.draw(self.screen)
 
-def kinectMouse():
-	print "Thread!"
-	while True:
-		print "Test"
-		time.sleep(1)
 
 if __name__ == "__main__":
 	screen = pygame.display.set_mode((1024, 768), 0, 32)
