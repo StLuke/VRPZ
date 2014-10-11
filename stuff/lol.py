@@ -12,7 +12,7 @@ smoothing = 5
 smoothingAngle = 10
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
-bangTime = 5000
+bangTime = 500000000
 #chance in %
 #speed of  food
 movechance = 1

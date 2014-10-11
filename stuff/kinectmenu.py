@@ -88,7 +88,7 @@ class IdleScreen():
 		self.bgColor = (0, 0, 0)
 		self.bgImage = pygame.transform.flip(pygame.image.load("../graphics/mainbg.jpg").convert(), 1, 0)
 		self.clock = pygame.time.Clock()
-		self.font = pygame.font.SysFont("LDFComicSans", 60)
+		self.font = pygame.font.SysFont("LDFComicSans", 40)
 		self.fontColor = (255, 255, 255)
 		self.menuItems = list()
 		self.itemNames = ("New game", "Quit")
@@ -97,6 +97,8 @@ class IdleScreen():
 		self.animalImgs = []
 		self.animalPictures = ["bison.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
 								"monkey.png", "sheep.png"]
+		self.activeFocus = 0
+		self.lastActiveFocus = 1
 
 	def buildMenu(self):
 		self.items = []
@@ -114,6 +116,7 @@ class IdleScreen():
 			self.menuItems.append(mi)
 
 	def startNewGame(self):
+		print "newgame"
 		sys.exit(1)
 
 	def run(self):
@@ -152,23 +155,34 @@ class IdleScreen():
 				if e.type == pygame.QUIT:
 					screenloop = False
 				elif e.type == pygame.MOUSEBUTTONDOWN:
-					for item in self.menuItems:
-						if item.isMouseSelect(mpos):
-							screenloop = self.menuFuncs[item.name]()
-							break;
+					screenloop = self.menuFuncs[self.itemNames[self.activeFocus]]()
+					break;
 
 			self.screen.blit(self.bgImage, (0, 0))
 			self.floatingPicture()
-
+			self.menuItems[self.activeFocus].applyFocus(self.screen)
+			self.menuItems[self.lastActiveFocus].removeFocus()
+			
 			for item in self.menuItems:
+				self.screen.blit(item.label, (item.xpos, item.ypos))
+
+			# 2 lazy 2 do somethin' beautiful and universal
+			if mpos[1] > self.scrHeight / 2:
+				self.activeFocus = 1
+				self.lastActiveFocus = 0
+			else:
+				self.activeFocus = 0
+				self.lastActiveFocus = 1
+
+			"""
 				if item.isMouseSelect(mpos):
 					item.applyFocus(self.screen)
 				else:
 					item.removeFocus()
-
-				self.screen.blit(item.label, (item.xpos, item.ypos))
-
 			"""
+				
+
+			
 			maxTip = [0, 1000]
 			
 			for cont in blobDataBack.contours: #Iterates through contours in the background
@@ -183,7 +197,7 @@ class IdleScreen():
 					if tips[1] < maxTip[1]:
 						maxTip = tips
 					#pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
-			"""
+			
 			del depth #Deletes depth --> opencv memory issue
 			screenFlipped = pygame.transform.flip(screen,1,0) #Flips the screen so that it is a mirror display
 			screen.blit(screenFlipped,(0,0)) #Updates the main screen --> screen
@@ -200,8 +214,8 @@ class IdleScreen():
 					dY = strY - centroidY #Finds the change in Y
 					#print "Display Res ", displayRes
 					#print "Centroid Res ", blobData.centroid[0] 
-					
-					minChange = 6
+					print mouseX, mouseY
+					minChange = 2
 					if abs(dX) > minChange: #If there was a change in X greater than 1...
 						mouseX = mousePtr["root_x"] - 2*dX #New X coordinate of mouse
 						if mouseX < 0:
@@ -214,7 +228,7 @@ class IdleScreen():
 							mouseY = 0
 						elif mouseY > self.scrHeight:
 							mouseY = self.scrHeight
-				
+					
 					#print "Mouse coords: ", mouseX, mouseY
 					#print "maxTip ", maxTip
 					move_mouse(mouseX,mouseY) #Moves mouse to new location
