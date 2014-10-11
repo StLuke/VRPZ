@@ -126,7 +126,7 @@ class IdleScreen():
 		areaRatioCache = constList(5,1)
 		# Initiate centroid list
 		centroidList = list()
-		screenFlipped = pygame.display.set_mode((self.scrWidth, self.scrHeight), 0, 32)
+		screenFlipped = pygame.display.set_mode((self.scrWidth, self.scrHeight), pygame.RESIZABLE)
 		# Iterator boolean --> Tells programw when to terminate
 		done = False 
 		# Very important bool for mouse manipulation
@@ -174,7 +174,19 @@ class IdleScreen():
 			else:
 				self.activeFocus = 0
 				self.lastActiveFocus = 1
-			
+
+
+			for cont in blobDataBack.contours: #Iterates through contours in the background
+				pygame.draw.lines(screen,(255,255,0),True,cont,3) #Colors the binary boundaries of the background yellow
+			for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
+				pygame.draw.circle(screen,(0,0,255),blobData.centroid[i],10) #Draws a blue circle at each centroid
+				centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
+				pygame.draw.lines(screen,(255,0,0),True,blobData.cHull[i],3) #Draws the convex hull for each blob
+				pygame.draw.lines(screen,(0,255,0),True,blobData.contours[i],3) #Draws the contour of each blob
+		
+				for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
+					pygame.draw.circle(screen,(255,0,255),tips,5) #Draws the vertices purple
+
 			# Deletes depth --> opencv memory issue
 			del depth 
 			# Flips the screen so that it is a mirror display
@@ -183,19 +195,19 @@ class IdleScreen():
 			screen.blit(screenFlipped,(0,0))
 			# Updates everything on the window
 			pygame.display.flip() 
-			
+		
 			# Mouse Try statement
 			try:
 				centroidX = blobData.centroid[0][0]
 				centroidY = blobData.centroid[0][1]
 				if dummy:
+					print "IN DUMMY"
 					# Gets current mouse attributes
 					mousePtr = display.Display().screen().root.query_pointer()._data 
 					# Finds the change in X
 					dX = centroidX - strX 
 					# Finds the change in Y
 					dY = strY - centroidY 
-					print mouseX, mouseY
 					minChange = 2
 					# If there was a change in X greater than minChange...
 					if abs(dX) > minChange:
@@ -205,7 +217,7 @@ class IdleScreen():
 							mouseX = 0
 						elif mouseX > self.scrWidth:
 							mouseX = self.scrWidth
-					# If there was a change in Y greater than 1...
+					# If there was a change in Y greater than minChange...
 					if abs(dY) > minChange: 
 						# New Y coordinate of mouse
 						mouseY = mousePtr["root_y"] - 2*dY 
@@ -213,7 +225,7 @@ class IdleScreen():
 							mouseY = 0
 						elif mouseY > self.scrHeight:
 							mouseY = self.scrHeight
-					
+					print mouseX, mouseY
 					# Moves mouse to new location
 					move_mouse(mouseX, mouseY)
 					# Makes the new starting X of mouse to current X of newest centroid 
@@ -226,7 +238,7 @@ class IdleScreen():
 					areaRatio = cacheAppendMean(areaRatioCache, blobData.contourArea[0]/cArea)
 					print cArea, areaRatio, "(Must be: < 1000, > 0.82)"
 					# Defines what a click down is. Area must be small and the hand must look like a binary circle (nearly)
-					if cArea < 25000 and areaRatio > 0.82: 
+					if cArea < 10000 and areaRatio > 0.82: 
 						click_down(1)
 					else:
 						click_up(1)
@@ -279,7 +291,7 @@ class BlobAnalysis:
 		# Iterate through the CvSeq, cs.
 		while cs: 
 			# Filters out contours smaller than 2500 pixels in area
-			if abs(cv.ContourArea(cs)) > 2500: 
+			if abs(cv.ContourArea(cs)) > 2000: 
 				# Appends contourArea with newest contour area
 				contourArea.append(cv.ContourArea(cs)) 
 				# Finds all of the moments of the filtered contour
