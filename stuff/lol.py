@@ -7,7 +7,6 @@ import pygame #Uses pygame
 import sys
 import socket
 import random
-import math
 
 smoothing = 5
 smoothingAngle = 10
@@ -71,7 +70,7 @@ def distance(x1,y1,x2,y2):
      """
      Calculates distance of two points
      """
-     dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+     dist = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
      return dist
 
 def in_hull(p, hull):
@@ -160,9 +159,11 @@ def hand_tracker():
     sound = pygame.mixer.Sound('../sound/' + sys.argv[1]+'.wav')
     crunch = pygame.mixer.Sound('../sound/crunch.wav')
     buzzer = pygame.mixer.Sound('../sound/buzzer.wav')
-    buzzer.set_volume(1.0)
+    slash = pygame.mixer.Sound('../sound/slash.wav')
+    buzzer.set_volume(5.0)
     crunch.set_volume(1.0)
-    sound.set_volume(0.5)
+    slash.set_volume(1.0)
+    sound.set_volume(0.25)
     sound.play()
 
     while not done:
@@ -198,17 +199,23 @@ def hand_tracker():
         #moving object
         if random.randint(0,10000) < movechance*100:
             down, up = 1, 5
-            print headPic, "FOOD"
             if headPic == 'lion' or headPic == 'vader':
-                print headPic
                 down = 0
             food = random.randint(down,up)
             moveCordY = random.randint(0, 384)
-            movingObject.append([0, moveCordY, food])
+            orientation = random.randint(0,1)
+            if orientation == 1:
+                movingObject.append([0, moveCordY, food, 1])
+            else:
+                movingObject.append([1024, moveCordY, food, -1])
         if random.randint(0,10000) < movechanceBad*100:
             candy = random.randint(0,3)
             moveCordY = random.randint(0, 384)
-            movingObjectBad.append([0, moveCordY, candy])
+            orientation = random.randint(0,1)
+            if orientation == 1:
+                movingObjectBad.append([0, moveCordY, candy, 1])
+            else:
+                movingObjectBad.append([1024, moveCordY, candy, -1])
 
         screen.fill(BLACK) #Make the window black
         screen.blit(wall, (0, 0))
@@ -216,15 +223,15 @@ def hand_tracker():
         for i in range(len(movingObject)):
             img = pygame.image.load(imgFood[movingObject[i][2]])
             screen.blit(img, (movingObject[i][0], movingObject[i][1]))
-            movingObject[i][0] = movingObject[i][0] +movespeed
-            if movingObject[i][0] > 1024:
+            movingObject[i][0] = movingObject[i][0] + movespeed * movingObject[i][3]
+            if movingObject[i][0] > 1024 or movingObject[i][0] < 0:
                 movingObject.remove(movingObject[i])
                 break
         for i in range(len(movingObjectBad)):
             img = pygame.image.load(imgCandy[movingObjectBad[i][2]])
             screen.blit(img, (movingObjectBad[i][0], movingObjectBad[i][1]))
-            movingObjectBad[i][0] = movingObjectBad[i][0] +movespeedBad
-            if movingObjectBad[i][0] > 1024:
+            movingObjectBad[i][0] = movingObjectBad[i][0] +movespeedBad * movingObjectBad[i][3]
+            if movingObjectBad[i][0] > 1024 or movingObjectBad[i][0] < 0:
                 movingObjectBad.remove(movingObjectBad[i])
                 break
 
@@ -304,7 +311,7 @@ def hand_tracker():
                 movingObjectBad.remove(movingObjectBad[i])
                 buzzer.play()
                 break
-
+        weaponPoionts = ()
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
 
             #pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
@@ -349,7 +356,6 @@ def hand_tracker():
 
             meanAngle=int(meanAngle/len(smoothAngle))
 
-
             imgZbran = rot_center(imgZbran, meanAngle)
             #imgZbran.get_rect().center = old_center
 
@@ -360,6 +366,7 @@ def hand_tracker():
         screenFlipped = pygame.transform.flip(screen,1,0) #Flips the screen so that it is a mirror display
         screen.blit(screenFlipped,(0,0)) #Updates the main screen --> screen
         pygame.display.flip() #Updates everything on the window
+
 
         for e in pygame.event.get(): #Itertates through current events
             if e.type is pygame.QUIT: #If the close button is pressed, the while loop ends
