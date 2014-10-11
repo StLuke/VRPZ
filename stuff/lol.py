@@ -163,6 +163,8 @@ def hand_tracker():
         screen.fill(BLACK) #Make the window black
         screen.blit(wall, (0, 0))
         (depth,_) = get_depth() #Get the depth from the kinect
+        old_depth = depth
+        depth = cv2.resize(old_depth, (1024, 768))
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
         _,depthThresh = cv2.threshold(depth, 650, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
         _,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
@@ -184,7 +186,7 @@ def hand_tracker():
 
         tempCont = []
         for cont in blobDataBack.contours: #Iterates through contours in the background
-            pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
+            pygame.draw.lines(screen,BLACK,True,cont,5) #Colors the binary boundaries of the background yellow
 
             for xcont,ycont in cont:
                 valid = True
