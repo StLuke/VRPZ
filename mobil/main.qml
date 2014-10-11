@@ -310,7 +310,6 @@ ApplicationWindow {
             anchors.left: odd1.right
             anchors.margins: 4
             width: parent.width / 3
-            snapMode: ListView.SnapOneItem
 
             delegate: Rectangle {
                 Image {
@@ -318,6 +317,53 @@ ApplicationWindow {
                     anchors.margins: 4
                     id: zvireKsicht
                     source: soubor
+                    Timer {
+                        running: true
+                        onTriggered: {
+                            interval = Math.random() * 5000
+                            running = true
+                            zvireKsichtKlepat.start() * 5000
+                        }
+                        repeat: false
+                        interval: Math.random()
+                    }
+
+                    SequentialAnimation {
+                        id: zvireKsichtKlepat
+                        PropertyAnimation {
+                            target: zvireKsicht
+                            properties: "rotation"
+                            to: 23
+                            duration: 100
+                        }
+                        PropertyAnimation {
+                            target: zvireKsicht
+                            properties: "rotation"
+                            to: -23
+                            duration: 100
+                        }
+                        PropertyAnimation {
+                            target: zvireKsicht
+                            properties: "rotation"
+                            to: 0
+                            duration: 100
+                        }
+                    }
+                    SequentialAnimation {
+                        id: zvireKsichtTocit
+                        PropertyAnimation {
+                            target: zvireKsicht
+                            properties: "rotation"
+                            to: 180
+                            duration: 60
+                        }
+                        PropertyAnimation {
+                            target: zvireKsicht
+                            properties: "rotation"
+                            to: 360
+                            duration: 60
+                        }
+                    }
                 }
 
                 color: "transparent"
@@ -326,6 +372,7 @@ ApplicationWindow {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
+                        zvireKsichtTocit.start()
                         dataReader.sendPacket("ksicht:"+soubor)
                     }
                 }
@@ -352,7 +399,6 @@ ApplicationWindow {
             anchors.left: odd2.right
             anchors.right: parent.right
             anchors.margins: 4
-            snapMode: ListView.SnapOneItem
 
             delegate: Rectangle {
                 Image {
