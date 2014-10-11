@@ -446,7 +446,7 @@ def hand_tracker():
             if trex:
                 if (blobData.centroid[i][0] - int(zbranW/2)) < (trexCoord[0] + trexMaxW/2) and (blobData.centroid[i][1] > trexCoord[1]):
                     screen.blit(bangImg, (trexCoord[0] + trexMaxW/2, blobData.centroid[i][1] - 150))
-                    is 'saber' in zbran:
+                    if 'vader' in zbran:
                         saber.play()
                     else:
                         slash.play()
@@ -477,7 +477,8 @@ def hand_tracker():
             if 'sheep' not in zbran:
                 for brick in range(len(movingObjectBad)):
                     if distance(movingObjectBad[brick][0], movingObjectBad[brick][1], blobData.centroid[i][0]-80, blobData.centroid[i][1]-80) < 150:
-                        is 'saber' in zbran:
+                        print zbran
+                        if 'vader' in zbran:
                             saber.play()
                         else:
                             slash.play()
