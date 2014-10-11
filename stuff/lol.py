@@ -449,6 +449,7 @@ def hand_tracker():
                     if 'vader' in zbran:
                         saber.play()
                     else:
+                        print zbran
                         slash.play()
 
 
@@ -481,6 +482,7 @@ def hand_tracker():
                         if 'vader' in zbran:
                             saber.play()
                         else:
+                            print zbran
                             slash.play()
                         banged.append([movingObjectBad[brick][0], movingObjectBad[brick][1], 0])
                         movingObjectBad.remove(movingObjectBad[brick])
