@@ -45,7 +45,7 @@ class MenuItem(pygame.font.Font):
 		self.height = height
 		self.font = font
 		self.fontColor = fontColor
-		self.label = self.font.render(name, 1, self.fontColor)
+		self.label = pygame.transform.flip(self.font.render(self.name, 1, self.fontColor), 1, 0)
 		self.itemImage = pygame.image.load("../graphics/menuico.png").convert()
 		self.itemImage.set_colorkey((255, 255, 255))
 
@@ -70,11 +70,11 @@ class MenuItem(pygame.font.Font):
 		return False
 
 	def applyFocus(self, screen):
-		self.label = self.font.render(self.name, 1, (255, 0, 0))
+		self.label = pygame.transform.flip(self.font.render(self.name, 1, (255, 0, 0)), 1, 0)
 		screen.blit(self.itemImage, (self.xpos - 70, self.ypos))
 
 	def removeFocus(self):
-		self.label = self.font.render(self.name, 1, self.fontColor)
+		self.label = pygame.transform.flip(self.font.render(self.name, 1, self.fontColor), 1, 0)
 
 class IdleScreen():
 	def __init__(self, screen):
@@ -83,7 +83,7 @@ class IdleScreen():
 		self.scrWidth = self.screen.get_rect().width
 		self.scrHeight = self.screen.get_rect().height
 		self.bgColor = (0, 0, 0)
-		self.bgImage = pygame.image.load("../graphics/mainbg.jpg").convert()
+		self.bgImage = pygame.transform.flip(pygame.image.load("../graphics/mainbg.jpg").convert(), 1, 0)
 		self.clock = pygame.time.Clock()
 		self.font = pygame.font.SysFont("Comic Sans MS", 50)
 		self.fontColor = (255, 255, 255)
@@ -99,7 +99,8 @@ class IdleScreen():
 		self.items = []
 
 		for index, item in enumerate(self.itemNames):
-			label = self.font.render(item, 1, self.fontColor)
+			label = pygame.transform.flip(self.font.render(item, 1, self.fontColor), 1, 0)
+			#abel = self.font.render(item, 1, self.fontColor)
 			width = label.get_rect().width
 			height = label.get_rect().height + 30
 			posx = (self.scrWidth / 2) - (width / 2)
@@ -134,6 +135,8 @@ class IdleScreen():
 		while screenloop:
 			self.clock.tick(30)
 			(depth,_) = get_depth() #Get the depth from the kinect 
+			old_depth = depth
+			depth = cv2.resize(old_depth, (1024, 768))
 			depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
 			_,depthThresh = cv2.threshold(depth, 600, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
 			_,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
@@ -164,14 +167,14 @@ class IdleScreen():
 
 			for cont in blobDataBack.contours: #Iterates through contours in the background
 				pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
-	        for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
+			for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
 				pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
 				centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
 				pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
 				pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
 				for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
 					pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
-   
+
 			del depth #Deletes depth --> opencv memory issue
 			screenFlipped = pygame.transform.flip(screen,1,0) #Flips the screen so that it is a mirror display
 			screen.blit(screenFlipped,(0,0)) #Updates the main screen --> screen
@@ -298,7 +301,6 @@ if __name__ == "__main__":
 	pygame.display.set_caption("ZOO")
 	idscr = IdleScreen(screen)
 	#try:   
-	#
 	idscr.run()
 	#except:
-	#	pass
+		
