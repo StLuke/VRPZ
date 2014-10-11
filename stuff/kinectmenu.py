@@ -113,7 +113,7 @@ class IdleScreen():
 	# This should somehow start new game with lol.py script - SHOULD, but it doesn't
 	def startNewGame(self):
 		print "newgame"
-		sys.exit(1)
+		sys.exit(5005)
 
 	# Main loop of this script
 	def run(self):

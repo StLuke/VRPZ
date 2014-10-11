@@ -1,5 +1,6 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.2
+import QtQuick.Controls.Styles 1.2
 
 import QtSensors 5.3
 
@@ -94,16 +95,12 @@ ApplicationWindow {
         }
     }
 
-    Component.onCompleted: {
-        dataReader.checkServer()
-    }
-
     menuBar: MenuBar {
         Menu {
             title: qsTr("Game")
             MenuItem {
-                text: qsTr("Reset")
-                onTriggered: vyber.show()
+                text: qsTr("Špatná IP obrazovky")
+                onTriggered: nastaveniIP.visible = true
             }
 
             MenuItem {
@@ -126,8 +123,49 @@ ApplicationWindow {
 
     Rectangle {
         id: nastaveniIP
+        anchors.fill: parent
         visible: false
+        z: 2
+        onVisibleChanged: ipField.text = ""
+        Text {
+            anchors.left: parent.left
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: parent.width /32
+            id: ipText
+            text: "IP nebo hostname:"
+            font.pixelSize: parent.width / 16
+        }
 
+        TextField {
+            id: ipField
+            anchors.margins: parent.width / 32
+            height: parent.width / 8
+            anchors.top: ipText.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+        }
+        Button {
+            anchors.margins: ipField.anchors.margins
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            width: ipField.width / 3
+            height: ipField.height
+            text: "Storno"
+            onClicked: parent.visible = false
+        }
+        Button {
+            anchors.margins: ipField.anchors.margins
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            width: ipField.width / 3
+            height: ipField.height
+            text: "OK"
+            onClicked: {
+                dataReader.setHost(ipField.text)
+                parent.visible = false
+            }
+        }
     }
 
     Rectangle {
@@ -250,7 +288,7 @@ ApplicationWindow {
         Rectangle {
             id: shadow
             anchors.fill: parent
-            color: "#cccccc"
+            color: "#444444"
             opacity: vyberButton.ready ? 0 : 0.8
         }
 
@@ -271,13 +309,13 @@ ApplicationWindow {
                 id: vyberButtonText
                 anchors.centerIn: parent
                 text: parent.ready ? "START" : "Navazuji spojení s obrazovkou"
-                font.pointSize: parent.ready ? (parent.height * 0.7) : (parent.height * 0.3)
+                font.pointSize: parent.ready ? (parent.width * 0.1) : (parent.width * 0.05)
             }
             MouseArea {
                 anchors.fill: parent
                 property int cnt: 0
                 onClicked: {
-                    if (parent.color == "red") {
+                    if (parent.color != "red") {
                         dataReader.sendPacket("fight")
                         dataReader.startFight()
                     }
