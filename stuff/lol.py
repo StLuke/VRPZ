@@ -108,7 +108,7 @@ address = ''
 
 
 def hand_tracker():
-
+    level = 1
     movechance = 1
     movechanceBad = 0.5
     movespeed = 6
@@ -195,11 +195,6 @@ def hand_tracker():
                 sound.set_volume(1.0)
                 sound.play()
 
-                movechance = 1
-                movechanceBad = 0.5
-                movespeed = 6
-                movespeedBad = 12
-
             if 'zbran' in data:
                 print "Menim zbran"
                 zbran = data.replace('zbran:', '')
@@ -215,16 +210,17 @@ def hand_tracker():
 
         hasic +=1
 
-        if hasic % 100 == 0:
+        if hasic % 200 == 0:
 
             #speed of  food
-            movechance +=0.2
+            movechance *= 2
             #speed of  junk food
-            movechanceBad = 0.2
+            movechanceBad *= 2
             #chance of food
             movespeed +=0.3
             #chance of junk food
             movespeedBad +=0.3
+            level += 1
 
         #moving object
         if random.randint(0,10000) < movechance*100:
@@ -250,10 +246,10 @@ def hand_tracker():
         screen.fill(BLACK) #Make the window black
         screen.blit(wall, (0, 0))
 
-        myfont = pygame.font.SysFont("Comic Sans MS", 50)
-        label = myfont.render("Score: " + str(score), 1, BLACK)
+        myfont = pygame.font.SysFont("Comic Sans MS", 90)
+        label = myfont.render("Level: "+ str(level)+"       Score: " + str(score), 1, BLACK)
         label = pygame.transform.flip(label,1,0)
-        screen.blit(label, (100, 100))
+        screen.blit(label, (264, 50))
 
         #kiss kissbang bang
         for bang in banged:
@@ -354,7 +350,7 @@ def hand_tracker():
             if distance(movingObjectBad[i][0], movingObjectBad[i][1], headCords[0], headCords[1]) < 75:
                 movingObjectBad.remove(movingObjectBad[i])
                 buzzer.play()
-                score -=100
+                score -=50
                 break
         weaponPoionts = ()
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
@@ -380,7 +376,7 @@ def hand_tracker():
             if blobData.centroid[i][0] > headCords[0]:
                 continue
             # Centrum ruky
-            pygame.draw.circle(screen,WHITE,blobData.centroid[i],10)
+            #pygame.draw.circle(screen,WHITE,blobData.centroid[i],10)
            # pygame.draw.circle(screen,RED,(blobData.centroid[i][0]-80,blobData.centroid[i][1]-80),10)
             imgZbran = pygame.image.load('../graphics/' + zbran)
             zbranW, zbranH = imgZbran.get_size()
