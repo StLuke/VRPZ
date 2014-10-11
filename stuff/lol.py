@@ -288,7 +288,7 @@ def hand_tracker():
         old_depth = depth
         depth = cv2.resize(old_depth, (1024, 768))
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
-        _,depthThresh = cv2.threshold(depth, 625, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
+        _,depthThresh = cv2.threshold(depth, 800, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
         _,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
         blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
@@ -345,9 +345,9 @@ def hand_tracker():
         xcord = mean[0] - (imgCow.get_rect().size[0]/2)
         ycord = mean[1] - (imgCow.get_rect().size[1]/2)
 
-        headCords = [xcord, ycord+65]
+        headCords = [xcord, ycord+75]
         # Hlava?
-        screen.blit(imgCow, (xcord, ycord+65))
+        screen.blit(imgCow, headCords)
 
         for i in range(len(movingObject)):
             if distance(movingObject[i][0], movingObject[i][1], headCords[0], headCords[1]) < 75:
@@ -362,7 +362,7 @@ def hand_tracker():
                 buzzer.play()
                 score -=50
                 break
-        weaponPoionts = ()
+
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
 
             #pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
