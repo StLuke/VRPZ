@@ -7,7 +7,7 @@ import pygame #Uses pygame
 import sys
 import socket
 import random
-
+import math
 
 smoothing = 5
 smoothingAngle = 10
@@ -67,6 +67,12 @@ class BlobAnalysis:
         self.cHullArea = cHullArea
         self.contourArea = contourArea
 
+def distance(x1,y1,x2,y2):
+     """
+     Calculates distance of two points
+     """
+     dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+     return dist
 
 def in_hull(p, hull):
     """
@@ -153,6 +159,8 @@ def hand_tracker():
     pygame.mixer.init()
     sound = pygame.mixer.Sound('../sound/' + sys.argv[1]+'.wav')
     crunch = pygame.mixer.Sound('../sound/crunch.wav')
+    buzzer = pygame.mixer.Sound('../sound/buzzer.wav')
+    buzzer.set_volume(1.0)
     crunch.set_volume(1.0)
     sound.set_volume(0.5)
     sound.play()
@@ -189,7 +197,6 @@ def hand_tracker():
 
         #moving object
         if random.randint(0,10000) < movechance*100:
-            crunch.play()
             down, up = 1, 5
             print headPic, "FOOD"
             if headPic == 'lion' or headPic == 'vader':
@@ -282,9 +289,21 @@ def hand_tracker():
         xcord = mean[0] - (imgCow.get_rect().size[0]/2)
         ycord = mean[1] - (imgCow.get_rect().size[1]/2)
 
-        headCords = [xcord, ycord]
+        headCords = [xcord, ycord+65]
         # Hlava?
         screen.blit(imgCow, (xcord, ycord+65))
+
+        for i in range(len(movingObject)):
+            if distance(movingObject[i][0], movingObject[i][1], headCords[0], headCords[1]) < 75:
+                movingObject.remove(movingObject[i])
+                crunch.play()
+                break
+
+         for i in range(len(movingObjectBad)):
+            if distance(movingObjecBadt[i][0], movingObjectBad[i][1], headCords[0], headCords[1]) < 75:
+                movingObjectBad.remove(movingObjectBad[i])
+                buzzer.play()
+                break
 
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
 
