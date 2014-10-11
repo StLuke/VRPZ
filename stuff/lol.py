@@ -6,12 +6,22 @@ import cv,cv2 #Uses both of cv and cv2
 import pygame #Uses pygame
 import sys
 import socket
+import random
 
 
 smoothing = 5
 smoothingAngle = 10
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
+#chance in %
+#speed of  food
+movechance = 2
+#speed of  junk food
+movechanceBad = 0.7
+#chance of food
+movespeed = 10
+#chance of junk food
+movespeedBad = 18
 
 """
 This class is a less extensive form of regionprops() developed by MATLAB. It finds properties of contours and sets them to fields
@@ -117,6 +127,9 @@ def hand_tracker():
     imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
     smoothVector = list()
     smoothAngle = list()
+
+    movingObject = list()
+    movingObjectBad = list()
     maxCont = (0, 1000)
 
     wall = pygame.image.load('../graphics/background.jpg')
@@ -131,6 +144,7 @@ def hand_tracker():
     sound = pygame.mixer.Sound('../graphics/' + sys.argv[1]+'.wav')
     sound.set_volume(1.0)
     sound.play()
+
     while not done:
         try:
             data,address = s.recvfrom(10000)
@@ -142,7 +156,7 @@ def hand_tracker():
                 imgCow = pygame.image.load('../graphics/' + data.replace('ksicht:', ''))
                 cowW, cowH = imgCow.get_size()
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
-                zbran = data.replace('ksicht:'. '').replace('.png','') + '_weapon.png'
+                zbran = data.replace('ksicht:', '').replace('.png','') + '_weapon.png'
                 sound = pygame.mixer.Sound('../sound/' + data.replace('ksicht:', '').replace('.png','.wav'))
                 sound.set_volume(1.0)
                 sound.play()
@@ -160,8 +174,35 @@ def hand_tracker():
         except Exception as e:
             pass
 
+        imgCandy = list()
+        for i in range(4):
+            imgCandy.append('../graphics/candy'+str(i) + '.png')
+        #moving object
+        if random.randint(0,10000) < movechance*100:
+            moveCordY = random.randint(0, 384)
+            movingObject.append([0, moveCordY])
+        if random.randint(0,10000) < movechanceBad*100:
+            candy = random.randint(0,4)
+            moveCordY = random.randint(0, 384)
+            movingObjectBad.append([0, moveCordY, candy])
         screen.fill(BLACK) #Make the window black
         screen.blit(wall, (0, 0))
+
+        for i in range(len(movingObject)):
+            pygame.draw.circle(screen,BLACK,(int(movingObject[i][0]), movingObject[i][1]),20)
+            movingObject[i][0] = movingObject[i][0] +movespeed
+            if movingObject[i][0] > 1024:
+                movingObject.remove(movingObject[i])
+                break
+
+        for i in range(len(movingObjectBad)):
+            img = pygame.image.load(imgCandy[movingObjectBad[i][2]])
+            screen.blit(img, (movingObjectBad[i][0], movingObjectBad[i][1]))
+            movingObjectBad[i][0] = movingObjectBad[i][0] +movespeedBad
+            if movingObjectBad[i][0] > 1024:
+                movingObjectBad.remove(movingObjectBad[i])
+                break
+
         (depth,_) = get_depth() #Get the depth from the kinect
         old_depth = depth
         depth = cv2.resize(old_depth, (1024, 768))
