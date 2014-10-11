@@ -151,8 +151,10 @@ def hand_tracker():
     head = [0, 10000]
 
     pygame.mixer.init()
-    sound = pygame.mixer.Sound('../graphics/' + sys.argv[1]+'.wav')
-    sound.set_volume(1.0)
+    sound = pygame.mixer.Sound('../sound/' + sys.argv[1]+'.wav')
+    crunch = pygame.mixer.Sound('../sound/crunch.wav')
+    crunch.set_volume(1.0)
+    sound.set_volume(0.5)
     sound.play()
 
     while not done:
@@ -187,6 +189,7 @@ def hand_tracker():
 
         #moving object
         if random.randint(0,10000) < movechance*100:
+            crunch.play()
             down, up = 1, 5
             print headPic, "FOOD"
             if headPic == 'lion' or headPic == 'vader':
