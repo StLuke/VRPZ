@@ -446,7 +446,10 @@ def hand_tracker():
             if trex:
                 if (blobData.centroid[i][0] - int(zbranW/2)) < (trexCoord[0] + trexMaxW/2) and (blobData.centroid[i][1] > trexCoord[1]):
                     screen.blit(bangImg, (trexCoord[0] + trexMaxW/2, blobData.centroid[i][1] - 150))
-                    slash.play()
+                    is 'saber' in zbran:
+                        saber.play()
+                    else:
+                        slash.play()
 
 
 
