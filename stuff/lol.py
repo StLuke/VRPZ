@@ -241,9 +241,9 @@ def hand_tracker():
         if hasic % 200 == 0 and level < 5:
 
             #speed of  food
-            movechance *= 2
+            movechance *= 1.7
             #speed of  junk food
-            movechanceBad *= 2
+            movechanceBad *= 1.7
             #chance of food
             movespeed +=0.3
             #chance of junk food
