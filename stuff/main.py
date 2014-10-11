@@ -3,7 +3,10 @@
 import pygame
 import sys
 import random
+import time
+import threading
 
+from kmouse.py import hand_tracker
 pygame.init()
 
 class BouncingSprite(pygame.sprite.Sprite):
@@ -12,14 +15,14 @@ class BouncingSprite(pygame.sprite.Sprite):
 		self.speed = speed
 		self.image = pygame.image.load(image)
 		self.rect = self.image.get_rect()
-		self.rect.move_ip(random.randint(0, scrWidth - self.rect.x), random.randint(0, scrHeight - self.rect.y))
+		self.rect.move_ip(random.randint(0, scrWidth - self.rect.width), random.randint(0, scrHeight - self.rect.height))
 		self.scrWidth = scrWidth
 		self.scrHeight = scrHeight
 
 	def update(self):
-		if (self.rect.x < 0) or (self.rect.x > self.scrWidth - self.image.get_rect().width):
+		if (self.rect.x < 0) or (self.rect.x > self.scrWidth - self.rect.width):
 			self.speed[0] *= -1
-		if (self.rect.y < 0) or (self.rect.y > self.scrHeight - self.image.get_rect().height):
+		if (self.rect.y < 0) or (self.rect.y > self.scrHeight - self.rect.height):
 			self.speed[1] *= -1
 
 		self.rect.x = self.rect.x + self.speed[0]
@@ -82,13 +85,9 @@ class IdleScreen():
 		self.itemNames = ("New game", "Quit")
 		self.menuFuncs = { 	"New game" : self.startNewGame,
 							"Quit" : sys.exit}
-		self.animalX = 0
-		self.animalY = self.scrHeight - 250
-		self.animalAct = None
-		self.animalImg = None
-		self.animalAngle = 0
-		self.animalPictures = ("bison.png", "cow.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
-								"monkey.png", "sheep.png", "vader.png")
+		self.animalImgs = []
+		self.animalPictures = ["bison.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
+								"monkey.png", "sheep.png"]
 
 	def buildMenu(self):
 		self.items = []
@@ -108,8 +107,14 @@ class IdleScreen():
 		print "THERE SHOULD BE SOMETHING"
 
 	def run(self):
-		self.buildMenu()
+		thread = None
 		screenloop = True
+		self.buildMenu()
+
+		t = threading.Thread(target=hand_tracker, args=self.screen)
+		t.daemon = True
+		t.start()
+
 		while screenloop:
 			self.clock.tick(30)
 			mpos = pygame.mouse.get_pos() 
@@ -137,16 +142,24 @@ class IdleScreen():
 			pygame.display.flip()
 
 	def floatingPicture(self):
-		if self.animalImg == None:
-			self.animalAct = random.choice(self.animalPictures)
-			self.animalImg = BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [5, 5])
-			self.animalX = -50;
+		self.animalAct = None
+
+		if self.animalImgs == []:
+			for i in range(0, 3):
+				self.animalAct = self.animalPictures.pop(random.randrange(len(self.animalPictures)))
+				self.animalImgs.append(BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [3, 3]))
 		else:
-			self.animalImg.update()
+			for img in self.animalImgs:
+				img.update()
 
+		for img in self.animalImgs:
+			img.draw(self.screen)
 
-		self.animalImg.draw(self.screen)
-
+def kinectMouse():
+	print "Thread!"
+	while True:
+		print "Test"
+		time.sleep(1)
 
 if __name__ == "__main__":
 	screen = pygame.display.set_mode((1024, 768), 0, 32)
