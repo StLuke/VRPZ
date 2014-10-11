@@ -147,7 +147,7 @@ def hand_tracker():
     for i in range(4):
         imgCandy.append('../graphics/candy'+str(i) + '.png')
 
-    wall = pygame.image.load('../graphics/background.jpg')
+    wall = pygame.image.load('../graphics/'+sys.argv[1]+'_bg.jpg')
 
     accX = 0
     accY = 0
@@ -179,6 +179,7 @@ def hand_tracker():
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
                 headPic = data.replace('ksicht:', '').replace('.png','')
                 zbran = headPic + '_weapon.png'
+                wall = pygame.image.load('../graphics/'+headPic+'_bg.jpg')
                 sound = pygame.mixer.Sound('../sound/' + data.replace('ksicht:', '').replace('.png','.wav'))
                 sound.set_volume(1.0)
                 sound.play()
