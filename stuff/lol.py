@@ -18,9 +18,9 @@ movechance = 2
 #speed of  junk food
 movechanceBad = 0.7
 #chance of food
-movespeed = 10
+movespeed = 6
 #chance of junk food
-movespeedBad = 18
+movespeedBad = 12
 head = 'lion'
 
 """
@@ -356,7 +356,7 @@ def hand_tracker():
             for val in smoothAngle:
                 meanAngle = meanAngle+val
 
-            meanAngle=90 #int(meanAngle/len(smoothAngle))
+            meanAngle=int(meanAngle/len(smoothAngle))
 
             imgZbran = rot_center(imgZbran, meanAngle)
             #imgZbran.get_rect().center = old_center
