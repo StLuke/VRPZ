@@ -99,7 +99,6 @@ class IdleScreen():
 								"monkey.png", "sheep.png"]
 		self.activeFocus = 0
 		self.lastActiveFocus = 1
-		self.lastCoords = [0, self.scrHeight]
 
 	def buildMenu(self):
 		self.items = []
