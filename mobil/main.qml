@@ -12,6 +12,77 @@ ApplicationWindow {
     height: 480
     visible: true
 
+    ListModel {
+        id: modyModel
+        ListElement {
+            url: "http://icons.iconarchive.com/icons/icons8/windows-8/512/Military-Sword-icon.png"
+            name: "Sám proti přírodě"
+        }
+        ListElement {
+            url: "https://cdn3.iconfinder.com/data/icons/ahasoft-war/512/guard-512.png"
+            name: "Zápas"
+        }
+    }
+
+    ListModel {
+        id: zvirataModel
+        ListElement {
+            name: "Bizon"
+            soubor: "bison.png"
+            url: "http://img2.wikia.nocookie.net/__cb20120812082359/adventuretimewithfinnandjake/images/0/06/Pig_trans.png"
+        }
+        ListElement {
+            name: "Darth Vader"
+            soubor: "vader.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+        ListElement {
+            name: "Kráva"
+            soubor: "cow.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+        ListElement {
+            name: "Slon"
+            soubor: "elephant.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+        ListElement {
+            name: "Žirafa"
+            soubor: "giraffe.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+        ListElement {
+            name: "Koza"
+            soubor: "goat.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+        ListElement {
+            name: "Lev"
+            soubor: "lion.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+        ListElement {
+            name: "Opice"
+            soubor: "monkey.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+        ListElement {
+            name: "Ovce"
+            soubor: "sheep.png"
+            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
+        }
+    }
+
+
+    ListModel {
+        id: zbraneModel
+        ListElement {
+            name: "Světelný meč"
+            soubor: "lightsaber.png"
+            url: "http://a.tgcdn.net/images/products/frontsquare/b72c_star_wars_lightsaber_single.jpg"
+        }
+    }
+
     DataReader {
         id: dataReader
         onServerMissing: {
@@ -21,7 +92,7 @@ ApplicationWindow {
             navazuji.text = "Obrazovka je momentálně obsazená, čekejte prosím"
         }
         onServerReady: {
-            mody.show()
+            vyber.show()
         }
     }
 
@@ -55,6 +126,8 @@ ApplicationWindow {
         }
     }
 
+
+
     Rectangle {
         id: content
         anchors.fill: parent
@@ -73,8 +146,6 @@ ApplicationWindow {
             }
             function show() {
                 mody.hide()
-                avatary.hide()
-                zbrane.hide()
                 fight.hide()
                 x = 0
             }
@@ -96,7 +167,7 @@ ApplicationWindow {
                     onClicked: {
                         clicked++
                         if (clicked == 5) {
-                            mody.show()
+                            vyber.show()
                             clicked = 0
                         }
                     }
@@ -114,76 +185,49 @@ ApplicationWindow {
         }
 
         Rectangle {
+            id: vyber
             color: "transparent"
-            clip:true
             x: width
             y: 0
             width: parent.width
-            height: parent.width
-            id: mody
-            function hide() {
-                x = -content.width
-            }
-            function show() {
-                uvod.hide()
-                avatary.hide()
-                zbrane.hide()
-                fight.hide()
-                x = 0
-            }
-
+            height: parent.height
             Behavior on x {
                 NumberAnimation {
                     duration: 100
                 }
             }
+            function hide() {
+                x = -content.width
+            }
+            function show() {
+                uvod.hide()
+                x = 0
+            }
 
             Text {
-                id: titulek
-                text: "Vyber si herní mód"
-                horizontalAlignment: Text.AlignHCenter
-                font.pointSize: 24
-                anchors.left: parent.left
-                anchors.right: parent.right
+                id: vyberText
+                text: "OFC"
             }
 
             ListView {
-                anchors.top: titulek.bottom
-                anchors.right: parent.right
+                id: seznamModu
+                anchors.top: vyberText.bottom
                 anchors.left:parent.left
-                anchors.bottom: parent.bottom
+                anchors.bottom: vyberButton.top
+                anchors.margins: 4
+                width: parent.width / 3
                 clip: true
                 spacing: 8
-                model: ListModel {
-                    ListElement {
-                        url: "http://icons.iconarchive.com/icons/icons8/windows-8/512/Military-Sword-icon.png"
-                        name: "Sám proti přírodě"
-                    }
-                    ListElement {
-                        url: "https://cdn3.iconfinder.com/data/icons/ahasoft-war/512/guard-512.png"
-                        name: "Zápas"
-                    }
-                }
+                model: modyModel
                 delegate: Rectangle {
                     color: "transparent"
-                    height: 96
+                    height: width
                     width: parent.width
                     Image {
                         id: nabidkaObrazek
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
+                        anchors.fill: parent
                         source:url
                         width: height
-                    }
-                    Text {
-                        anchors.left: nabidkaObrazek.right
-                        anchors.top: parent.top
-                        anchors.right: parent.right
-                        anchors.bottom:parent.bottom
-                        text: name
-                        verticalAlignment: Text.AlignVCenter
-                        font.pointSize: 24
                     }
                     MouseArea {
                         anchors.fill: parent
@@ -193,170 +237,39 @@ ApplicationWindow {
                     }
                 }
             }
-        }
 
-        Rectangle {
-            color: "transparent"
-            clip: true
-            id: avatary
-            x: parent.width
-            y: 0
-            width: parent.width
-            height: parent.height
-            function hide() {
-                x = -content.width
-            }
-            function show() {
-                uvod.hide()
-                mody.hide()
-                zbrane.hide()
-                fight.hide()
-                x = 0
-            }
-            Behavior on x {
-                NumberAnimation {
-                    id: anim
-                    duration: 200
-                }
-            }
-
-            Text {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                horizontalAlignment: Text.AlignHCenter
-                id: avatarText
-                font.pointSize: 32
-                text: "Vyber si avatara"
-            }
 
             ListView {
                 id: seznamZvirat
                 spacing: 10
-                model: zvirata
+                model: zvirataModel
                 clip:true
-                anchors.top: avatarText.bottom
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
+                anchors.top: vyberText.bottom
+                anchors.bottom: vyberButton.top
+                anchors.left: seznamModu.right
+                anchors.margins: 4
+                width: parent.width / 3
 
                 delegate: Rectangle {
                     Image {
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
+                        anchors.fill: parent
                         anchors.margins: 4
                         id: zvireKsicht
-                        height: parent.height
-                        width: height
                         source: url
-                    }
-
-                    Text {
-                        anchors.left: zvireKsicht.right
-                        anchors.right: parent.right
-                        anchors.leftMargin: 8
-                        height: parent.height
-
-                        verticalAlignment: Text.AlignVCenter
-                        font.pointSize: 28
-                        text: name
                     }
 
                     color: "transparent"
                     width: parent.width
-                    height: 92
+                    height: width
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
                             dataReader.sendPacket("ksicht:"+soubor)
-                            zbrane.show()
                         }
                     }
                 }
             }
 
-            ListModel {
-                id: zvirata
-                ListElement {
-                    name: "Bizon"
-                    soubor: "bison.png"
-                    url: "http://img2.wikia.nocookie.net/__cb20120812082359/adventuretimewithfinnandjake/images/0/06/Pig_trans.png"
-                }
-                ListElement {
-                    name: "Darth Vader"
-                    soubor: "vader.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-                ListElement {
-                    name: "Kráva"
-                    soubor: "cow.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-                ListElement {
-                    name: "Slon"
-                    soubor: "elephant.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-                ListElement {
-                    name: "Žirafa"
-                    soubor: "giraffe.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-                ListElement {
-                    name: "Koza"
-                    soubor: "goat.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-                ListElement {
-                    name: "Lev"
-                    soubor: "lion.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-                ListElement {
-                    name: "Opice"
-                    soubor: "monkey.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-                ListElement {
-                    name: "Ovce"
-                    soubor: "sheep.png"
-                    url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-                }
-            }
-        }
-
-        Rectangle {
-            color: "transparent"
-            clip: true
-            id: zbrane
-            x: parent.width
-            y: 0
-            width: parent.width
-            height: parent.height
-            function hide() {
-                x = -content.width
-            }
-            function show() {
-                uvod.hide()
-                mody.hide()
-                avatary.hide()
-                fight.hide()
-                x = 0
-            }
-            Behavior on x {
-                NumberAnimation {
-                    duration: 200
-                }
-            }
-
-            Text {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                horizontalAlignment: Text.AlignHCenter
-                id: zbraneText
-                font.pointSize: 32
-                text: "Vyber si zbraň"
-            }
 
 
             ListView {
@@ -364,37 +277,23 @@ ApplicationWindow {
                 spacing: 10
                 model: zbraneModel
                 clip:true
-                anchors.top: zbraneText.bottom
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
+                anchors.top: vyberText.bottom
+                anchors.bottom: vyberButton.top
+                anchors.left: seznamZvirat.right
                 anchors.right: parent.right
+                anchors.margins: 4
 
                 delegate: Rectangle {
                     Image {
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
+                        anchors.fill: parent
                         anchors.margins: 4
                         id: zbranObrazek
-                        height: parent.height
-                        width: height
                         source: url
-                    }
-
-                    Text {
-                        anchors.left: zbranObrazek.right
-                        anchors.right: parent.right
-                        anchors.leftMargin: 8
-                        height: parent.height
-
-                        verticalAlignment: Text.AlignVCenter
-                        font.pointSize: 28
-                        text: name
                     }
 
                     color: "transparent"
                     width: parent.width
-                    height: 92
+                    height: width
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
@@ -407,15 +306,24 @@ ApplicationWindow {
                 }
             }
 
-            ListModel {
-                id: zbraneModel
-                ListElement {
-                    name: "Světelný meč"
-                    soubor: "lightsaber.png"
-                    url: "http://a.tgcdn.net/images/products/frontsquare/b72c_star_wars_lightsaber_single.jpg"
+            Rectangle {
+                id: vyberButton
+                color: "green"
+                height: 64
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.margins: 4
+                radius: 10
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "START"
+                    font.pointSize: 36
                 }
             }
         }
+
         Rectangle {
             color: "transparent"
             clip: true
@@ -429,9 +337,7 @@ ApplicationWindow {
             }
             function show() {
                 uvod.hide()
-                mody.hide()
-                avatary.hide()
-                zbrane.hide()
+                vyber.hide()
                 x = 0
             }
             Behavior on x {
