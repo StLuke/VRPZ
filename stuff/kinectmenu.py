@@ -127,7 +127,7 @@ class IdleScreen():
 		BLUE = (0,0,255)
 		WHITE = (255,255,255)
 		YELLOW = (255,255,0)
-		screenFlipped = pygame.display.set_mode((self.scrWidth,self.scrHeight),pygame.RESIZABLE)
+		screenFlipped = pygame.display.set_mode((self.scrWidth, self.scrHeight), 0, 32)
 		done = False #Iterator boolean --> Tells programw when to terminate
 		dummy = False #Very important bool for mouse manipulation
 		self.buildMenu()
@@ -138,7 +138,7 @@ class IdleScreen():
 			old_depth = depth
 			depth = cv2.resize(old_depth, (1024, 768))
 			depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
-			_,depthThresh = cv2.threshold(depth, 600, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
+			_,depthThresh = cv2.threshold(depth, 650, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
 			_,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
 			blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
 			blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
@@ -188,16 +188,17 @@ class IdleScreen():
 					mousePtr = display.Display().screen().root.query_pointer()._data #Gets current mouse attributes
 					dX = centroidX - strX #Finds the change in X
 					dY = strY - centroidY #Finds the change in Y
-					if abs(dX) > 1: #If there was a change in X greater than 1...
+					if abs(dX) > 6: #If there was a change in X greater than 1...
 						mouseX = mousePtr["root_x"] - 2*dX #New X coordinate of mouse
-					if abs(dY) > 1: #If there was a change in Y greater than 1...
+					if abs(dY) > 6: #If there was a change in Y greater than 1...
 						mouseY = mousePtr["root_y"] - 2*dY #New Y coordinate of mouse
 					move_mouse(mouseX,mouseY) #Moves mouse to new location
 					strX = centroidX #Makes the new starting X of mouse to current X of newest centroid
 					strY = centroidY #Makes the new starting Y of mouse to current Y of newest centroid
 					cArea = cacheAppendMean(cHullAreaCache,blobData.cHullArea[0]) #Normalizes (gets rid of noise) in the convex hull area
 					areaRatio = cacheAppendMean(areaRatioCache, blobData.contourArea[0]/cArea) #Normalizes the ratio between the contour area and convex hull area
-					if cArea < 10000 and areaRatio > 0.82: #Defines what a click down is. Area must be small and the hand must look like a binary circle (nearly)
+					print cArea, areaRatio, "(Must be: < 1000, > 0.82)"
+					if cArea < 20000 and areaRatio > 0.82: #Defines what a click down is. Area must be small and the hand must look like a binary circle (nearly)
 						click_down(1)
 					else:
 						click_up(1)
@@ -223,7 +224,8 @@ class IdleScreen():
 			img.draw(self.screen)
 
 """
-This class is a less extensive form of regionprops() developed by MATLAB. It finds properties of contours and sets them to fields
+This class is a less extensive form of regionprops() developed by MATLAB. 
+It finds properties of contours and sets them to fields
 """
 class BlobAnalysis:
 	def __init__(self,BW): #Constructor. BW is a binary image in the form of a numpy array
@@ -273,10 +275,12 @@ def move_mouse(x,y):#Moves the mouse to (x,y). x and y are ints
 	d.sync()
 	
 def click_down(button):#Simulates a down click. Button is an int
+	print "GOT CLICK DOWN"
 	Xlib.ext.xtest.fake_input(d,X.ButtonPress, button)
 	d.sync()
 	
 def click_up(button): #Simulates a up click. Button is an int
+	print "GOT CLICK UP"
 	Xlib.ext.xtest.fake_input(d,X.ButtonRelease, button)
 	d.sync()
 
