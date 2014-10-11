@@ -2,9 +2,30 @@
 
 import pygame
 import sys
-import time
+import random
 
 pygame.init()
+
+class BouncingSprite(pygame.sprite.Sprite):
+	def __init__(self, image, scrWidth, scrHeight, speed=[2,2]):
+		pygame.sprite.Sprite.__init__(self)
+		self.speed = speed
+		self.image = pygame.image.load(image)
+		self.rect = self.image.get_rect()
+		self.scrWidth = scrWidth
+		self.scrHeight = scrHeight
+
+	def update(self):
+		if (self.rect.x < 0) or (self.rect.x > self.scrWidth - self.image.get_rect().width):
+			self.speed[0] *= -1
+		if (self.rect.y < 0) or (self.rect.y > self.scrHeight - self.image.get_rect().height):
+			self.speed[1] *= -1
+
+		self.rect.x = self.rect.x + self.speed[0]
+		self.rect.y = self.rect.y + self.speed[1]
+
+	def draw(self, screen):
+		screen.blit(self.image, self.rect)
 
 class MenuItem(pygame.font.Font):
 	def __init__(self, name, xpos, ypos, width, height, font, fontColor):
@@ -60,7 +81,13 @@ class IdleScreen():
 		self.itemNames = ("New game", "Quit")
 		self.menuFuncs = { 	"New game" : self.startNewGame,
 							"Quit" : sys.exit}
-		self.selectedItem = None;
+		self.animalX = 0
+		self.animalY = self.scrHeight - 250
+		self.animalAct = None
+		self.animalImg = None
+		self.animalAngle = 0
+		self.animalPictures = ("bison.png", "cow.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
+								"monkey.png", "sheep.png", "vader.png")
 
 	def drawMenu(self):
 		self.items = []
@@ -82,7 +109,7 @@ class IdleScreen():
 	def run(self):
 		screenloop = True
 		while screenloop:
-			self.clock.tick(25)
+			self.clock.tick(30)
 			mpos = pygame.mouse.get_pos() 
 
 			self.drawMenu()
@@ -106,7 +133,20 @@ class IdleScreen():
 
 				self.screen.blit(item.label, (item.xpos, item.ypos))
 
+			self.floatingPicture()
 			pygame.display.flip()
+
+	def floatingPicture(self):
+		if self.animalImg == None:
+			self.animalAct = random.choice(self.animalPictures)
+			self.animalImg = BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [5, 5])
+			self.animalX = -50;
+		else:
+			self.animalImg.update()
+
+
+		self.animalImg.draw(self.screen)
+
 
 if __name__ == "__main__":
 	screen = pygame.display.set_mode((1024, 768), 0, 32)
