@@ -16,27 +16,50 @@ ApplicationWindow {
     ListModel {
         id: modyModel
         ListElement {
-            soubor: "food0.png"
+            obrazky: [
+                ListElement {
+                    soubor: "food0.png"
+                },
+                ListElement {
+                    soubor: "candy0.png"
+                },
+                ListElement {
+                    soubor: "food1.png"
+                },
+                ListElement {
+                    soubor: "candy1.png"
+                },
+                ListElement {
+                    soubor: "food2.png"
+                },
+                ListElement {
+                    soubor: "candy2.png"
+                },
+                ListElement {
+                    soubor: "food3.png"
+                },
+                ListElement {
+                    soubor: "candy3.png"
+                },
+                ListElement {
+                    soubor: "food4.png"
+                },
+                ListElement {
+                    soubor: "food5.png"
+                }
+            ]
         }
     }
 
     ListModel {
         id: zvirataModel
         ListElement {
-            name: "Bizon"
-            soubor: "bison.png"
-        }
-        ListElement {
-            name: "Darth Vader"
-            soubor: "vader.png"
-        }
-        ListElement {
             name: "Slon"
             soubor: "elephant.png"
         }
         ListElement {
-            name: "Žirafa"
-            soubor: "giraffe.png"
+            name: "Opice"
+            soubor: "monkey.png"
         }
         ListElement {
             name: "Koza"
@@ -47,12 +70,20 @@ ApplicationWindow {
             soubor: "lion.png"
         }
         ListElement {
-            name: "Opice"
-            soubor: "monkey.png"
-        }
-        ListElement {
             name: "Ovce"
             soubor: "sheep.png"
+        }
+        ListElement {
+            name: "Žirafa"
+            soubor: "giraffe.png"
+        }
+        ListElement {
+            name: "Bizon"
+            soubor: "bison.png"
+        }
+        ListElement {
+            name: "Darth Vader"
+            soubor: "vader.png"
         }
     }
 
@@ -60,16 +91,10 @@ ApplicationWindow {
     ListModel {
         id: zbraneModel
         ListElement {
-            soubor: "bison_weapon.png"
-        }
-        ListElement {
-            soubor: "vader_weapon.png"
-        }
-        ListElement {
             soubor: "elephant_weapon.png"
         }
         ListElement {
-            soubor: "giraffe_weapon.png"
+            soubor: "monkey_weapon.png"
         }
         ListElement {
             soubor: "goat_weapon.png"
@@ -78,10 +103,16 @@ ApplicationWindow {
             soubor: "lion_weapon.png"
         }
         ListElement {
-            soubor: "monkey_weapon.png"
+            soubor: "sheep_weapon.png"
         }
         ListElement {
-            soubor: "sheep_weapon.png"
+            soubor: "giraffe_weapon.png"
+        }
+        ListElement {
+            soubor: "bison_weapon.png"
+        }
+        ListElement {
+            soubor: "vader_weapon.png"
         }
     }
 
@@ -98,6 +129,21 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("Game")
+            MenuItem {
+                text: qsTr("Bonus")
+                onTriggered: dataReader.sendPacket("bonus")
+            }
+
+            MenuItem {
+                text: qsTr("Win")
+                onTriggered: dataReader.sendPacket("win")
+            }
+
+            MenuItem {
+                text: qsTr("Reset")
+                onTriggered: dataReader.sendPacket("reset")
+            }
+
             MenuItem {
                 text: qsTr("Špatná IP obrazovky")
                 onTriggered: nastaveniIP.visible = true
@@ -147,7 +193,7 @@ ApplicationWindow {
         }
         Button {
             anchors.margins: ipField.anchors.margins
-            anchors.bottom: parent.bottom
+            anchors.top: ipField.bottom
             anchors.left: parent.left
             width: ipField.width / 3
             height: ipField.height
@@ -156,7 +202,7 @@ ApplicationWindow {
         }
         Button {
             anchors.margins: ipField.anchors.margins
-            anchors.bottom: parent.bottom
+            anchors.top: ipField.bottom
             anchors.right: parent.right
             width: ipField.width / 3
             height: ipField.height
@@ -200,24 +246,59 @@ ApplicationWindow {
             clip: true
             spacing: 8
             model: modyModel
-            delegate: Rectangle {
-                color: "transparent"
-                height: width
-                width: parent.width
-                Image {
-                    id: nabidkaObrazek
-                    anchors.fill: parent
-                    source:soubor
-                    width: height
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
+            snapMode: ListView.SnapOneItem
+            delegate:
+                PathView {
+                    id: nestedView
+                    width: parent.width
+                    height: width
+                    clip: true
+                    interactive: false
+                    model: obrazky
+                    pathItemCount: 2
+                    path: Path {
+                                startX: -0.5*width; startY: height/2
+                                PathQuad { x: 1.5*width; y: height/2; controlX: 0.5*width; controlY: height/2}
+                            }
+                    snapMode: ListView.SnapOneItem
+                    Timer {
+                        interval: 2500
+                        repeat: true
+                        running: true
+                        onTriggered: {
+                            nestedView.currentIndex++
+                            if (nestedView.currentIndex >= nestedView.count)
+                                nestedView.currentIndex = 0
+                        }
+                    }
+
+
+
+                    delegate: Image {
+                        id: nabidkaObrazek
+                        source: soubor
+                        width: nestedView.width
+                        height: width
+                        fillMode: Image.PreserveAspectFit
+                    }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                        }
                     }
                 }
-            }
+
         }
 
+        Rectangle {
+            id: odd1
+            width: parent.width / 160
+            anchors.left: seznamModu.right
+            anchors.top: parent.top
+            anchors.bottom: vyberButton.top
+            anchors.topMargin: parent.height / 32
+            anchors.bottomMargin: parent.height / 32
+        }
 
         ListView {
             id: seznamZvirat
@@ -226,9 +307,10 @@ ApplicationWindow {
             clip:true
             anchors.top: vyberText.bottom
             anchors.bottom: vyberButton.top
-            anchors.left: seznamModu.right
+            anchors.left: odd1.right
             anchors.margins: 4
             width: parent.width / 3
+            snapMode: ListView.SnapOneItem
 
             delegate: Rectangle {
                 Image {
@@ -250,7 +332,15 @@ ApplicationWindow {
             }
         }
 
-
+        Rectangle {
+            id: odd2
+            width: parent.width / 160
+            anchors.left: seznamZvirat.right
+            anchors.top: parent.top
+            anchors.bottom: vyberButton.top
+            anchors.topMargin: parent.height / 32
+            anchors.bottomMargin: parent.height / 32
+        }
 
         ListView {
             id: seznamZbrani
@@ -259,9 +349,10 @@ ApplicationWindow {
             clip:true
             anchors.top: vyberText.bottom
             anchors.bottom: vyberButton.top
-            anchors.left: seznamZvirat.right
+            anchors.left: odd2.right
             anchors.right: parent.right
             anchors.margins: 4
+            snapMode: ListView.SnapOneItem
 
             delegate: Rectangle {
                 Image {
@@ -309,22 +400,14 @@ ApplicationWindow {
                 id: vyberButtonText
                 anchors.centerIn: parent
                 text: parent.ready ? "START" : "Navazuji spojení s obrazovkou"
-                font.pointSize: parent.ready ? (parent.width * 0.1) : (parent.width * 0.05)
+                font.pointSize: parent.ready ? (parent.width * 0.07) : (parent.width * 0.03)
             }
             MouseArea {
                 anchors.fill: parent
                 property int cnt: 0
                 onClicked: {
-                    if (parent.color != "red") {
-                        dataReader.sendPacket("fight")
-                        dataReader.startFight()
-                    }
-                    else {
-                        cnt++
-                        if (cnt == 3) {
-                            cnt = 0
-                        }
-                    }
+                    dataReader.sendPacket("fight")
+                    dataReader.startFight()
                 }
             }
         }

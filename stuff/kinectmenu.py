@@ -20,12 +20,12 @@ constList = lambda length, val: [val for _ in range(length)]
 
 # Class for bouncing animal image
 class BouncingSprite(pygame.sprite.Sprite):
-	def __init__(self, image, scrWidth, scrHeight, speed=[2,2]):
+	def __init__(self, image, scrWidth, scrHeight, startW, startH, speed=[2,2]):
 		pygame.sprite.Sprite.__init__(self)
 		self.speed = speed
 		self.image = pygame.image.load(image)
 		self.rect = self.image.get_rect()
-		self.rect.move_ip(random.randint(0, scrWidth - self.rect.width), random.randint(0, scrHeight - self.rect.height))
+		self.rect.move_ip(startW if startW == 0 else startW - self.rect.width, startH)
 		self.scrWidth = scrWidth
 		self.scrHeight = scrHeight
 
@@ -126,7 +126,7 @@ class IdleScreen():
 		areaRatioCache = constList(5,1)
 		# Initiate centroid list
 		centroidList = list()
-		screenFlipped = pygame.display.set_mode((self.scrWidth, self.scrHeight), 0, 32)
+		screenFlipped = pygame.display.set_mode((self.scrWidth, self.scrHeight), pygame.RESIZABLE)
 		# Iterator boolean --> Tells programw when to terminate
 		done = False 
 		# Very important bool for mouse manipulation
@@ -174,7 +174,19 @@ class IdleScreen():
 			else:
 				self.activeFocus = 0
 				self.lastActiveFocus = 1
-			
+
+
+			#for cont in blobDataBack.contours: #Iterates through contours in the background
+			#	pygame.draw.lines(screen,(255,255,0),True,cont,3) #Colors the binary boundaries of the background yellow
+			for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
+			#	pygame.draw.circle(screen,(0,0,255),blobData.centroid[i],10) #Draws a blue circle at each centroid
+				centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
+			#	pygame.draw.lines(screen,(255,0,0),True,blobData.cHull[i],3) #Draws the convex hull for each blob
+			#	pygame.draw.lines(screen,(0,255,0),True,blobData.contours[i],3) #Draws the contour of each blob
+		
+			#	for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
+			#		pygame.draw.circle(screen,(255,0,255),tips,5) #Draws the vertices purple
+
 			# Deletes depth --> opencv memory issue
 			del depth 
 			# Flips the screen so that it is a mirror display
@@ -183,7 +195,7 @@ class IdleScreen():
 			screen.blit(screenFlipped,(0,0))
 			# Updates everything on the window
 			pygame.display.flip() 
-			
+		
 			# Mouse Try statement
 			try:
 				centroidX = blobData.centroid[0][0]
@@ -195,7 +207,6 @@ class IdleScreen():
 					dX = centroidX - strX 
 					# Finds the change in Y
 					dY = strY - centroidY 
-					print mouseX, mouseY
 					minChange = 2
 					# If there was a change in X greater than minChange...
 					if abs(dX) > minChange:
@@ -205,7 +216,7 @@ class IdleScreen():
 							mouseX = 0
 						elif mouseX > self.scrWidth:
 							mouseX = self.scrWidth
-					# If there was a change in Y greater than 1...
+					# If there was a change in Y greater than minChange...
 					if abs(dY) > minChange: 
 						# New Y coordinate of mouse
 						mouseY = mousePtr["root_y"] - 2*dY 
@@ -213,7 +224,7 @@ class IdleScreen():
 							mouseY = 0
 						elif mouseY > self.scrHeight:
 							mouseY = self.scrHeight
-					
+					print mouseX, mouseY
 					# Moves mouse to new location
 					move_mouse(mouseX, mouseY)
 					# Makes the new starting X of mouse to current X of newest centroid 
@@ -226,7 +237,7 @@ class IdleScreen():
 					areaRatio = cacheAppendMean(areaRatioCache, blobData.contourArea[0]/cArea)
 					print cArea, areaRatio, "(Must be: < 1000, > 0.82)"
 					# Defines what a click down is. Area must be small and the hand must look like a binary circle (nearly)
-					if cArea < 25000 and areaRatio > 0.82: 
+					if cArea < 10000 and areaRatio > 0.82: 
 						click_down(1)
 					else:
 						click_up(1)
@@ -245,11 +256,12 @@ class IdleScreen():
 	# Handles, creates and updates floating/bouncing animals in menu screen
 	def floatingPicture(self):
 		self.animalAct = None
-
+		self.animalPos = [[0, 0], [1024, 0]]
 		if self.animalImgs == []:
-			for i in range(0, 3):
+			for i in range(0, 2):
 				self.animalAct = self.animalPictures.pop(random.randrange(len(self.animalPictures)))
-				self.animalImgs.append(BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [3, 3]))
+				self.animalImgs.append(BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight,
+					self.animalPos[i][0], self.animalPos[i][1], [3, 3]))
 		else:
 			for img in self.animalImgs:
 				img.update()
@@ -279,7 +291,7 @@ class BlobAnalysis:
 		# Iterate through the CvSeq, cs.
 		while cs: 
 			# Filters out contours smaller than 2500 pixels in area
-			if abs(cv.ContourArea(cs)) > 2500: 
+			if abs(cv.ContourArea(cs)) > 2000: 
 				# Appends contourArea with newest contour area
 				contourArea.append(cv.ContourArea(cs)) 
 				# Finds all of the moments of the filtered contour
@@ -336,7 +348,7 @@ def click_down(button):
 	
 # Simulates a up click. Button is an int
 def click_up(button):
-	print "GOT CLICK UP"
+	# print "GOT CLICK UP"
 	Xlib.ext.xtest.fake_input(d,X.ButtonRelease, button)
 	d.sync()
 
