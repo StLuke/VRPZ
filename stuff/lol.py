@@ -181,6 +181,7 @@ def hand_tracker():
                 headPic = data.replace('ksicht:', '').replace('.png','')
                 zbran = headPic + '_weapon.png'
                 wall = pygame.image.load('../graphics/'+headPic+'_bg.jpg')
+                sound.stop()
                 sound = pygame.mixer.Sound('../sound/' + data.replace('ksicht:', '').replace('.png','.wav'))
                 sound.set_volume(1.0)
                 sound.play()
