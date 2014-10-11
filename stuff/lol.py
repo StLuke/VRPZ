@@ -12,12 +12,14 @@ smoothing = 5
 smoothingAngle = 10
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
+score = 0
+
 bangTime = 5
 #chance in %
 #speed of  food
 movechance = 1
 #speed of  junk food
-movechanceBad = 0.3
+movechanceBad = 0.5
 #chance of food
 movespeed = 6
 #chance of junk food
@@ -316,12 +318,14 @@ def hand_tracker():
             if distance(movingObject[i][0], movingObject[i][1], headCords[0], headCords[1]) < 75:
                 movingObject.remove(movingObject[i])
                 crunch.play()
+                score += 10
                 break
 
         for i in range(len(movingObjectBad)):
             if distance(movingObjectBad[i][0], movingObjectBad[i][1], headCords[0], headCords[1]) < 75:
                 movingObjectBad.remove(movingObjectBad[i])
                 buzzer.play()
+                score -=100
                 break
         weaponPoionts = ()
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
