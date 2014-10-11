@@ -19,7 +19,7 @@ void DataReader::checkServer() {
         emit serverMissing();
     }
     m_timer->setSingleShot(true);
-    m_timer->start(5000);
+    m_timer->start(3000);
 }
 
 void DataReader::timeout() {
@@ -44,7 +44,6 @@ void DataReader::setHost(const QString &name) {
 
 void DataReader::readPacket() {
     m_timer->stop();
-    qDebug() << "ZPRAVA";
     while (m_sock->hasPendingDatagrams()) {
         QByteArray incomingData;
         incomingData.resize(m_sock->pendingDatagramSize());
@@ -58,7 +57,7 @@ void DataReader::readPacket() {
         else
             qDebug() << "Unrecognized  message, contents:" << incomingData;
     }
-    m_timer->start(5000);
+    checkServer();
 }
 
 void DataReader::startFight() {
