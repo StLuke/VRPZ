@@ -124,6 +124,7 @@ def hand_tracker():
     BLUE = (0,0,255)
     WHITE = (255,255,255)
     YELLOW = (255,255,0)
+    score = 0
     pygame.init() #Initiates pygame
     xSize,ySize = 1024,768 #Sets size of window
     WIDTH,HEIGHT = xSize,ySize
@@ -248,6 +249,11 @@ def hand_tracker():
 
         screen.fill(BLACK) #Make the window black
         screen.blit(wall, (0, 0))
+
+        myfont = pygame.font.SysFont("Comic Sans MS", 50)
+        label = myfont.render("Score: " + str(score), 1, BLACK)
+        label = pygame.transform.flip(label,1,0)
+        screen.blit(label, (100, 100))
 
         #kiss kissbang bang
         for bang in banged:
