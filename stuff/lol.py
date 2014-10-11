@@ -150,7 +150,7 @@ def hand_tracker():
         imgCandy.append('../graphics/candy'+str(i) + '.png')
 
     wall = pygame.image.load('../graphics/'+sys.argv[1]+'_bg.jpg')
-    bang = pygame.image.load('../graphics/bang.png')
+    bangImg = pygame.image.load('../graphics/bang.png')
     accX = 0
     accY = 0
     accZ = 0
@@ -201,7 +201,7 @@ def hand_tracker():
 
         #kiss kissbang bang
         for bang in banged:
-            screen.blit(img, (bang[0], bang[1]))
+            screen.blit(bangImg, (bang[0], bang[1]))
             bang[2] = bang[2] + 1
             if bang[2] > bangTime:
                 banged.remove(bang)
@@ -373,13 +373,13 @@ def hand_tracker():
 
             screen.blit(imgZbran, (blobData.centroid[i][0] - int(zbranW/2), blobData.centroid[i][1] - int(zbranH/2)))
 
-            if zbran != 'sheep':
+            if 'sheep' in zbran:
                 for brick in range(len(movingObjectBad)):
                     if distance(movingObjectBad[brick][0], movingObjectBad[brick][1], blobData.centroid[i][0]-80, blobData.centroid[i][1]-80) < 150:
                         movingObjectBad.remove(movingObjectBad[brick])
                         slash.play()
+                        banged.append([movingObjectBad[brick][0], movingObjectBad[brick][1], 0])
                         break
-                    banged.append([movingObjectBad[brick][0], movingObjectBad[brick][1], 0])
 
         pygame.display.set_caption('ZOO') #Makes the caption of the pygame screen 'Kinect Tracking'
         del depth #Deletes depth --> opencv memory issue
