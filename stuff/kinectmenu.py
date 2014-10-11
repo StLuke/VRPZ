@@ -20,12 +20,12 @@ constList = lambda length, val: [val for _ in range(length)]
 
 # Class for bouncing animal image
 class BouncingSprite(pygame.sprite.Sprite):
-	def __init__(self, image, scrWidth, scrHeight, speed=[2,2]):
+	def __init__(self, image, scrWidth, scrHeight, startW, startH, speed=[2,2]):
 		pygame.sprite.Sprite.__init__(self)
 		self.speed = speed
 		self.image = pygame.image.load(image)
 		self.rect = self.image.get_rect()
-		self.rect.move_ip(random.randint(0, scrWidth - self.rect.width), random.randint(0, scrHeight - self.rect.height))
+		self.rect.move_ip(startW if startW == 0 else startW - self.rect.width, startH)
 		self.scrWidth = scrWidth
 		self.scrHeight = scrHeight
 
@@ -201,7 +201,6 @@ class IdleScreen():
 				centroidX = blobData.centroid[0][0]
 				centroidY = blobData.centroid[0][1]
 				if dummy:
-					print "IN DUMMY"
 					# Gets current mouse attributes
 					mousePtr = display.Display().screen().root.query_pointer()._data 
 					# Finds the change in X
@@ -257,11 +256,12 @@ class IdleScreen():
 	# Handles, creates and updates floating/bouncing animals in menu screen
 	def floatingPicture(self):
 		self.animalAct = None
-
+		self.animalPos = [[0, 0], [1024, 0]]
 		if self.animalImgs == []:
-			for i in range(0, 3):
+			for i in range(0, 2):
 				self.animalAct = self.animalPictures.pop(random.randrange(len(self.animalPictures)))
-				self.animalImgs.append(BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [3, 3]))
+				self.animalImgs.append(BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight,
+					self.animalPos[i][0], self.animalPos[i][1], [3, 3]))
 		else:
 			for img in self.animalImgs:
 				img.update()
@@ -348,7 +348,7 @@ def click_down(button):
 	
 # Simulates a up click. Button is an int
 def click_up(button):
-	print "GOT CLICK UP"
+	# print "GOT CLICK UP"
 	Xlib.ext.xtest.fake_input(d,X.ButtonRelease, button)
 	d.sync()
 
