@@ -9,7 +9,7 @@
 DataReader::DataReader(QObject *parent) :
     QObject(parent), m_sock(new QUdpSocket(this)), m_rotation(new QRotationSensor(this)), m_timer(new QTimer(this)) {
     m_rotation->setDataRate(5);
-    setHost("localhost");
+    setHost("147.229.179.75");
     connect(m_rotation, SIGNAL(readingChanged()), this, SLOT(newReading()));
     connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
