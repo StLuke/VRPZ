@@ -22,6 +22,7 @@ public slots:
     void sendPacket(const QString &data);
     void readPacket();
     void startFight();
+    void setHost(const QString &name);
 private slots:
     void newReading();
     void timeout();

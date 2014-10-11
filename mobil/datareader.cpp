@@ -8,11 +8,9 @@
 
 DataReader::DataReader(QObject *parent) :
     QObject(parent), m_sock(new QUdpSocket(this)), m_rotation(new QRotationSensor(this)), m_timer(new QTimer(this)) {
-    m_sock->connectToHost(QHostAddress("147.229.179.75"), 5005);
-    m_sock->waitForConnected();
     m_rotation->setDataRate(5);
+    setHost("localhost");
     connect(m_rotation, SIGNAL(readingChanged()), this, SLOT(newReading()));
-    connect(m_sock, SIGNAL(readyRead()), this, SLOT(readPacket()));
     connect(m_timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
@@ -34,6 +32,16 @@ void DataReader::sendPacket(const QString &msg) {
         emit serverMissing();
 }
 
+void DataReader::setHost(const QString &name) {
+    qDebug() << "setting host" << name;
+    m_sock->deleteLater();
+    m_sock = new QUdpSocket(this);
+    connect(m_sock, SIGNAL(readyRead()), this, SLOT(readPacket()));
+    m_sock->connectToHost(QHostAddress(name), 5005);
+    m_sock->waitForConnected();
+    checkServer();
+}
+
 void DataReader::readPacket() {
     m_timer->stop();
     qDebug() << "ZPRAVA";
@@ -50,6 +58,7 @@ void DataReader::readPacket() {
         else
             qDebug() << "Unrecognized  message, contents:" << incomingData;
     }
+    m_timer->start(5000);
 }
 
 void DataReader::startFight() {
