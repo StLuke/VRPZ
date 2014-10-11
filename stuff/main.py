@@ -12,15 +12,14 @@ class BouncingSprite(pygame.sprite.Sprite):
 		self.speed = speed
 		self.image = pygame.image.load(image)
 		self.rect = self.image.get_rect()
-		print self.rect
-		self.rect.move_ip(random.randint(0, scrWidth - self.rect.width), random.randint(0, scrHeight - self.rect.height - 1))
+		self.rect.move_ip(random.randint(0, scrWidth - self.rect.width), random.randint(0, scrHeight - self.rect.height))
 		self.scrWidth = scrWidth
 		self.scrHeight = scrHeight
 
 	def update(self):
-		if (self.rect.x < 0) or (self.rect.x > self.scrWidth - self.image.get_rect().width):
+		if (self.rect.x < 0) or (self.rect.x > self.scrWidth - self.rect.width):
 			self.speed[0] *= -1
-		if (self.rect.y < 0) or (self.rect.y > self.scrHeight - self.image.get_rect().height):
+		if (self.rect.y < 0) or (self.rect.y > self.scrHeight - self.rect.height):
 			self.speed[1] *= -1
 
 		self.rect.x = self.rect.x + self.speed[0]
@@ -84,8 +83,8 @@ class IdleScreen():
 		self.menuFuncs = { 	"New game" : self.startNewGame,
 							"Quit" : sys.exit}
 		self.animalImgs = []
-		self.animalPictures = ("bison.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
-								"monkey.png", "sheep.png")
+		self.animalPictures = ["bison.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
+								"monkey.png", "sheep.png"]
 
 	def buildMenu(self):
 		self.items = []
@@ -138,7 +137,7 @@ class IdleScreen():
 
 		if self.animalImgs == []:
 			for i in range(0, 3):
-				self.animalAct = self.animalPictures[random.randrange(len(self.animalPictures))]
+				self.animalAct = self.animalPictures.pop(random.randrange(len(self.animalPictures)))
 				self.animalImgs.append(BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [3, 3]))
 		else:
 			for img in self.animalImgs:
