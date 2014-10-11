@@ -180,10 +180,12 @@ def hand_tracker():
     crunch = pygame.mixer.Sound('../sound/crunch.wav')
     buzzer = pygame.mixer.Sound('../sound/buzzer.wav')
     slash = pygame.mixer.Sound('../sound/slash.wav')
+    saber = pygame.mixer.Sound('../sound/saber.wav')
     buzzer.set_volume(1.0)
     crunch.set_volume(1.0)
     slash.set_volume(1.0)
     sound.set_volume(1.0)
+    saber.set_volume(1.0)
     sound.play()
 
     while not done:
@@ -466,7 +468,10 @@ def hand_tracker():
             if 'sheep' not in zbran:
                 for brick in range(len(movingObjectBad)):
                     if distance(movingObjectBad[brick][0], movingObjectBad[brick][1], blobData.centroid[i][0]-80, blobData.centroid[i][1]-80) < 150:
-                        slash.play()
+                        is 'saber' in zbran:
+                            saber.play()
+                        else:
+                            slash.play()
                         banged.append([movingObjectBad[brick][0], movingObjectBad[brick][1], 0])
                         movingObjectBad.remove(movingObjectBad[brick])
                         break
