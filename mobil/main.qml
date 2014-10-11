@@ -15,12 +15,7 @@ ApplicationWindow {
     ListModel {
         id: modyModel
         ListElement {
-            url: "http://icons.iconarchive.com/icons/icons8/windows-8/512/Military-Sword-icon.png"
-            name: "Sám proti přírodě"
-        }
-        ListElement {
-            url: "https://cdn3.iconfinder.com/data/icons/ahasoft-war/512/guard-512.png"
-            name: "Zápas"
+            soubor: "food0.png"
         }
     }
 
@@ -92,13 +87,10 @@ ApplicationWindow {
     DataReader {
         id: dataReader
         onServerMissing: {
-            navazuji.text = "Obrazovka není v dosahu"
-        }
-        onServerBusy: {
-            navazuji.text = "Obrazovka je momentálně obsazená, čekejte prosím"
+            vyberButton.ready = false
         }
         onServerReady: {
-            vyber.show()
+            vyberButton.ready = true
         }
     }
 
@@ -123,7 +115,7 @@ ApplicationWindow {
 
     Image {
         anchors.fill: parent
-        source: "http://picturesforcoloring.com/wp-content/uploads/2012/05/jungle-wallpaper.jpg"
+        source: "mainbg.jpg"
         fillMode: Image.PreserveAspectCrop
         Rectangle {
             anchors.fill: parent
@@ -132,201 +124,168 @@ ApplicationWindow {
         }
     }
 
+    Rectangle {
+        id: nastaveniIP
+        visible: false
 
+    }
 
     Rectangle {
-        id: content
-        anchors.fill: parent
+        id: vyber
         color: "transparent"
-
-        Rectangle {
-            color: "transparent"
-            clip:true
-            x: 0
-            y: 0
-            width: parent.width
-            height: parent.height
-            id: uvod
-            function hide() {
-                x = -content.width
+        anchors.fill: parent
+        Behavior on x {
+            NumberAnimation {
+                duration: 100
             }
-            function show() {
-                vyber.hide()
-                x = 0
-            }
+        }
+        function hide() {
+            x = -content.width
+        }
+        function show() {
+            uvod.hide()
+            x = 0
+        }
 
-            Behavior on x {
-                NumberAnimation {
-                    duration: 100
+        Text {
+            id: vyberText
+            height: 0
+        }
+
+        ListView {
+            id: seznamModu
+            anchors.top: vyberText.bottom
+            anchors.left:parent.left
+            anchors.bottom: vyberButton.top
+            anchors.margins: 4
+            width: parent.width / 3
+            clip: true
+            spacing: 8
+            model: modyModel
+            delegate: Rectangle {
+                color: "transparent"
+                height: width
+                width: parent.width
+                Image {
+                    id: nabidkaObrazek
+                    anchors.fill: parent
+                    source:soubor
+                    width: height
                 }
-            }
-            Text {
-                id: navazuji
-                anchors.fill: parent
-                text: "Navazuji spojení s obrazovkou"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
                 MouseArea {
                     anchors.fill: parent
-                    property int clicked: 0
                     onClicked: {
-                        clicked++
-                        if (clicked == 5) {
-                            vyber.show()
-                            clicked = 0
-                        }
                     }
                 }
             }
-            Text {
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottomMargin: 128
-                horizontalAlignment: Text.AlignHCenter
-                color: "#444444"
-                text: "Hodí se poznamenat,\nže menu se dá prolézt i když je server off\ntím, že člověk 5x poklepe na displej...\nAkorát to nebude nic dělat, OFC"
+        }
+
+
+        ListView {
+            id: seznamZvirat
+            spacing: 10
+            model: zvirataModel
+            clip:true
+            anchors.top: vyberText.bottom
+            anchors.bottom: vyberButton.top
+            anchors.left: seznamModu.right
+            anchors.margins: 4
+            width: parent.width / 3
+
+            delegate: Rectangle {
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    id: zvireKsicht
+                    source: soubor
+                }
+
+                color: "transparent"
+                width: parent.width
+                height: width
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        dataReader.sendPacket("ksicht:"+soubor)
+                    }
+                }
+            }
+        }
+
+
+
+        ListView {
+            id: seznamZbrani
+            spacing: 10
+            model: zbraneModel
+            clip:true
+            anchors.top: vyberText.bottom
+            anchors.bottom: vyberButton.top
+            anchors.left: seznamZvirat.right
+            anchors.right: parent.right
+            anchors.margins: 4
+
+            delegate: Rectangle {
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    id: zbranObrazek
+                    source: soubor
+                    scale: 2
+                    transform: Translate { x: -(parent.width/2) }
+                }
+
+                color: "transparent"
+                width: parent.width
+                height: width
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        dataReader.sendPacket("zbran:"+soubor)
+                    }
+                }
             }
         }
 
         Rectangle {
-            id: vyber
-            color: "transparent"
-            x: width
-            y: 0
-            width: parent.width
-            height: parent.height
-            Behavior on x {
-                NumberAnimation {
-                    duration: 100
-                }
-            }
-            function hide() {
-                x = -content.width
-            }
-            function show() {
-                uvod.hide()
-                x = 0
-            }
+            id: shadow
+            anchors.fill: parent
+            color: "#cccccc"
+            opacity: vyberButton.ready ? 0 : 0.8
+        }
+
+        Rectangle {
+            property bool ready: false
+
+            id: vyberButton
+            color: ready ? "green" : "red"
+            height: parent.height / 10
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: 4
+            radius: 10
+            z: 2
 
             Text {
-                id: vyberText
-                text: "OFC"
+                id: vyberButtonText
+                anchors.centerIn: parent
+                text: parent.ready ? "START" : "Navazuji spojení s obrazovkou"
+                font.pointSize: parent.ready ? (parent.height * 0.7) : (parent.height * 0.3)
             }
-
-            ListView {
-                id: seznamModu
-                anchors.top: vyberText.bottom
-                anchors.left:parent.left
-                anchors.bottom: vyberButton.top
-                anchors.margins: 4
-                width: parent.width / 3
-                clip: true
-                spacing: 8
-                model: modyModel
-                delegate: Rectangle {
-                    color: "transparent"
-                    height: width
-                    width: parent.width
-                    Image {
-                        id: nabidkaObrazek
-                        anchors.fill: parent
-                        source:url
-                        width: height
-                    }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                        }
-                    }
-                }
-            }
-
-
-            ListView {
-                id: seznamZvirat
-                spacing: 10
-                model: zvirataModel
-                clip:true
-                anchors.top: vyberText.bottom
-                anchors.bottom: vyberButton.top
-                anchors.left: seznamModu.right
-                anchors.margins: 4
-                width: parent.width / 3
-
-                delegate: Rectangle {
-                    Image {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        id: zvireKsicht
-                        source: soubor
-                    }
-
-                    color: "transparent"
-                    width: parent.width
-                    height: width
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            dataReader.sendPacket("ksicht:"+soubor)
-                        }
-                    }
-                }
-            }
-
-
-
-            ListView {
-                id: seznamZbrani
-                spacing: 10
-                model: zbraneModel
-                clip:true
-                anchors.top: vyberText.bottom
-                anchors.bottom: vyberButton.top
-                anchors.left: seznamZvirat.right
-                anchors.right: parent.right
-                anchors.margins: 4
-
-                delegate: Rectangle {
-                    Image {
-                        anchors.fill: parent
-                        anchors.margins: 4
-                        id: zbranObrazek
-                        source: soubor
-                    }
-
-                    color: "transparent"
-                    width: parent.width
-                    height: width
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            dataReader.sendPacket("zbran:"+soubor)
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                id: vyberButton
-                color: "green"
-                height: 64
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.margins: 4
-                radius: 10
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "START"
-                    font.pointSize: 36
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
+            MouseArea {
+                anchors.fill: parent
+                property int cnt: 0
+                onClicked: {
+                    if (parent.color == "red") {
                         dataReader.sendPacket("fight")
                         dataReader.startFight()
+                    }
+                    else {
+                        cnt++
+                        if (cnt == 3) {
+                            cnt = 0
+                        }
                     }
                 }
             }
