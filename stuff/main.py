@@ -11,7 +11,10 @@ class BouncingSprite(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 		self.speed = speed
 		self.image = pygame.image.load(image)
+		pygame.sprite.LayeredUpdates.move_to_back(self)
+		move_to_back(self.image)
 		self.rect = self.image.get_rect()
+		self.rect.move_ip(random.randint(0, scrWidth - self.rect.x), random.randint(0, scrHeight - self.rect.y))
 		self.scrWidth = scrWidth
 		self.scrHeight = scrHeight
 
