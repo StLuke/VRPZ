@@ -237,7 +237,7 @@ class IdleScreen():
 					areaRatio = cacheAppendMean(areaRatioCache, blobData.contourArea[0]/cArea)
 					print cArea, areaRatio, "(Must be: < 1000, > 0.82)"
 					# Defines what a click down is. Area must be small and the hand must look like a binary circle (nearly)
-					if cArea < 10000 and areaRatio > 0.82: 
+					if cArea < 25000 and areaRatio > 0.82: 
 						click_down(1)
 					else:
 						click_up(1)

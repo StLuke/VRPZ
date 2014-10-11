@@ -219,7 +219,12 @@ def hand_tracker():
                 movespeedBad = 12
                 hasic =0
             if 'bonus' in data:
-                trex = True
+                if trex:
+                    trex = False
+                else:
+                    trex = True
+                    trexW, trexH = 200, 210
+                    trexCoord = [-200, 300]
             if ";" in data:
                 # Suradnice
                 try:
@@ -441,6 +446,7 @@ def hand_tracker():
             if trex:
                 if (blobData.centroid[i][0] - int(zbranW/2)) < (trexCoord[0] + trexMaxW/2) and (blobData.centroid[i][1] > trexCoord[1]):
                     screen.blit(bangImg, (trexCoord[0] + trexMaxW/2, blobData.centroid[i][1] - 150))
+                    slash.play()
 
 
 
