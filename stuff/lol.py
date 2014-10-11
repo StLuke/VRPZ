@@ -160,10 +160,10 @@ def hand_tracker():
     crunch = pygame.mixer.Sound('../sound/crunch.wav')
     buzzer = pygame.mixer.Sound('../sound/buzzer.wav')
     slash = pygame.mixer.Sound('../sound/slash.wav')
-    buzzer.set_volume(5.0)
+    buzzer.set_volume(1.0)
     crunch.set_volume(1.0)
     slash.set_volume(1.0)
-    sound.set_volume(0.25)
+    sound.set_volume(1.0)
     sound.play()
 
     while not done:
@@ -239,7 +239,7 @@ def hand_tracker():
         old_depth = depth
         depth = cv2.resize(old_depth, (1024, 768))
         depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
-        _,depthThresh = cv2.threshold(depth, 650, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
+        _,depthThresh = cv2.threshold(depth, 625, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
         _,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
         blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
         blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
@@ -336,6 +336,7 @@ def hand_tracker():
                 continue
             # Centrum ruky
             pygame.draw.circle(screen,WHITE,blobData.centroid[i],10)
+            pygame.draw.circle(screen,RED,(blobData.centroid[i][0]-80,blobData.centroid[i][1]-80),10)
             imgZbran = pygame.image.load('../graphics/' + zbran)
             zbranW, zbranH = imgZbran.get_size()
 
@@ -354,12 +355,18 @@ def hand_tracker():
             for val in smoothAngle:
                 meanAngle = meanAngle+val
 
-            meanAngle=int(meanAngle/len(smoothAngle))
+            meanAngle=90 #int(meanAngle/len(smoothAngle))
 
             imgZbran = rot_center(imgZbran, meanAngle)
             #imgZbran.get_rect().center = old_center
 
             screen.blit(imgZbran, (blobData.centroid[i][0] - int(zbranW/2), blobData.centroid[i][1] - int(zbranH/2)))
+
+            for brick in range(len(movingObjectBad)):
+                if distance(movingObjectBad[brick][0], movingObjectBad[brick][1], blobData.centroid[i][0]-80, blobData.centroid[i][1]-80) < 150:
+                    movingObjectBad.remove(movingObjectBad[brick])
+                    slash.play()
+                    break
 
         pygame.display.set_caption('ZOO') #Makes the caption of the pygame screen 'Kinect Tracking'
         del depth #Deletes depth --> opencv memory issue
