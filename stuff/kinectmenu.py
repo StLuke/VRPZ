@@ -138,7 +138,7 @@ class IdleScreen():
 			old_depth = depth
 			depth = cv2.resize(old_depth, (1024, 768))
 			depth = depth.astype(np.float32) #Convert the depth to a 32 bit float
-			_,depthThresh = cv2.threshold(depth, 650, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
+			_,depthThresh = cv2.threshold(depth, 600, 255, cv2.THRESH_BINARY_INV) #Threshold the depth for a binary image. Thresholded at 600 arbitary units
 			_,back = cv2.threshold(depth, 900, 255, cv2.THRESH_BINARY_INV) #Threshold the background in order to have an outlined background and segmented foreground
 			blobData = BlobAnalysis(depthThresh) #Creates blobData object using BlobAnalysis class
 			blobDataBack = BlobAnalysis(back) #Creates blobDataBack object using BlobAnalysis class
@@ -164,7 +164,7 @@ class IdleScreen():
 					item.removeFocus()
 
 				self.screen.blit(item.label, (item.xpos, item.ypos))
-
+		
 			for cont in blobDataBack.contours: #Iterates through contours in the background
 				pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
 			for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
@@ -174,7 +174,7 @@ class IdleScreen():
 				pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
 				for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
 					pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
-
+			
 			del depth #Deletes depth --> opencv memory issue
 			screenFlipped = pygame.transform.flip(screen,1,0) #Flips the screen so that it is a mirror display
 			screen.blit(screenFlipped,(0,0)) #Updates the main screen --> screen
@@ -188,10 +188,19 @@ class IdleScreen():
 					mousePtr = display.Display().screen().root.query_pointer()._data #Gets current mouse attributes
 					dX = centroidX - strX #Finds the change in X
 					dY = strY - centroidY #Finds the change in Y
-					if abs(dX) > 6: #If there was a change in X greater than 1...
+					if abs(dX) > 5: #If there was a change in X greater than 1...
 						mouseX = mousePtr["root_x"] - 2*dX #New X coordinate of mouse
-					if abs(dY) > 6: #If there was a change in Y greater than 1...
+						if mouseX < 0:
+							mouseX = 0
+						elif mouseX > self.scrWidth:
+							mouseX = self.scrWidth
+					if abs(dY) > 5: #If there was a change in Y greater than 1...
 						mouseY = mousePtr["root_y"] - 2*dY #New Y coordinate of mouse
+						if mouseY < 0:
+							mouseY = 0
+						elif mouseY > self.scrHeight:
+							mouseY = self.scrHeight
+					print "Mouse coords: ", mouseX, mouseY
 					move_mouse(mouseX,mouseY) #Moves mouse to new location
 					strX = centroidX #Makes the new starting X of mouse to current X of newest centroid
 					strY = centroidY #Makes the new starting Y of mouse to current Y of newest centroid
