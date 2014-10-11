@@ -122,7 +122,7 @@ def hand_tracker():
 
     # HOLY COW!!
     zbran = sys.argv[1]+'_weapon.png'
-    head = sys.argv[1]
+    headPic = sys.argv[1]
     scale = 1.0
     imgCow = pygame.image.load('../graphics/' +sys.argv[1]+'.png')
     cowW, cowH = imgCow.get_size()
@@ -166,8 +166,8 @@ def hand_tracker():
                 imgCow = pygame.image.load('../graphics/' + data.replace('ksicht:', ''))
                 cowW, cowH = imgCow.get_size()
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
-                head = data.replace('ksicht:', '').replace('.png','')
-                zbran = head + '_weapon.png'
+                headPic = data.replace('ksicht:', '').replace('.png','')
+                zbran = headPic + '_weapon.png'
                 sound = pygame.mixer.Sound('../sound/' + data.replace('ksicht:', '').replace('.png','.wav'))
                 sound.set_volume(1.0)
                 sound.play()
@@ -185,24 +185,21 @@ def hand_tracker():
         except Exception as e:
             pass
 
-        imgCandy = list()
-        imgFood = list()
-        for i in range(6):
-            imgFood.append('../graphics/food'+str(i) + '.png')
-        for i in range(4):
-            imgCandy.append('../graphics/candy'+str(i) + '.png')
         #moving object
         if random.randint(0,10000) < movechance*100:
-            down, up = 1, 6
-            if head is 'lion' or head is 'vader':
+            down, up = 1, 5
+            print headPic, "FOOD"
+            if headPic == 'lion' or headPic == 'vader':
+                print headPic
                 down = 0
             food = random.randint(down,up)
             moveCordY = random.randint(0, 384)
             movingObject.append([0, moveCordY, food])
         if random.randint(0,10000) < movechanceBad*100:
-            candy = random.randint(0,4)
+            candy = random.randint(0,3)
             moveCordY = random.randint(0, 384)
             movingObjectBad.append([0, moveCordY, candy])
+
         screen.fill(BLACK) #Make the window black
         screen.blit(wall, (0, 0))
 
@@ -213,7 +210,6 @@ def hand_tracker():
             if movingObject[i][0] > 1024:
                 movingObject.remove(movingObject[i])
                 break
-
         for i in range(len(movingObjectBad)):
             img = pygame.image.load(imgCandy[movingObjectBad[i][2]])
             screen.blit(img, (movingObjectBad[i][0], movingObjectBad[i][1]))
