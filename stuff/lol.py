@@ -22,6 +22,7 @@ movechanceBad = 0.7
 movespeed = 10
 #chance of junk food
 movespeedBad = 18
+head = 'lion'
 
 """
 This class is a less extensive form of regionprops() developed by MATLAB. It finds properties of contours and sets them to fields
@@ -121,6 +122,7 @@ def hand_tracker():
 
     # HOLY COW!!
     zbran = sys.argv[1]+'_weapon.png'
+    head = sys.argv[1]
     scale = 1.0
     imgCow = pygame.image.load('../graphics/' +sys.argv[1]+'.png')
     cowW, cowH = imgCow.get_size()
@@ -131,6 +133,14 @@ def hand_tracker():
     movingObject = list()
     movingObjectBad = list()
     maxCont = (0, 1000)
+
+    imgFood, imgCandy = list(), list()
+
+    for i in range(6):
+        imgFood.append('../graphics/food'+str(i) + '.png')
+
+    for i in range(4):
+        imgCandy.append('../graphics/candy'+str(i) + '.png')
 
     wall = pygame.image.load('../graphics/background.jpg')
 
@@ -156,7 +166,8 @@ def hand_tracker():
                 imgCow = pygame.image.load('../graphics/' + data.replace('ksicht:', ''))
                 cowW, cowH = imgCow.get_size()
                 imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
-                zbran = data.replace('ksicht:', '').replace('.png','') + '_weapon.png'
+                head = data.replace('ksicht:', '').replace('.png','')
+                zbran = head + '_weapon.png'
                 sound = pygame.mixer.Sound('../sound/' + data.replace('ksicht:', '').replace('.png','.wav'))
                 sound.set_volume(1.0)
                 sound.play()
@@ -175,12 +186,19 @@ def hand_tracker():
             pass
 
         imgCandy = list()
+        imgFood = list()
+        for i in range(6):
+            imgFood.append('../graphics/food'+str(i) + '.png')
         for i in range(4):
             imgCandy.append('../graphics/candy'+str(i) + '.png')
         #moving object
         if random.randint(0,10000) < movechance*100:
+            down, up = 1, 6
+            if head is 'lion' or head is 'vader':
+                down = 0
+            food = random.randint(down,up)
             moveCordY = random.randint(0, 384)
-            movingObject.append([0, moveCordY])
+            movingObject.append([0, moveCordY, food])
         if random.randint(0,10000) < movechanceBad*100:
             candy = random.randint(0,4)
             moveCordY = random.randint(0, 384)
@@ -189,7 +207,8 @@ def hand_tracker():
         screen.blit(wall, (0, 0))
 
         for i in range(len(movingObject)):
-            pygame.draw.circle(screen,BLACK,(int(movingObject[i][0]), movingObject[i][1]),20)
+            img = pygame.image.load(imgFood[movingObject[i][2]])
+            screen.blit(img, (movingObject[i][0], movingObject[i][1]))
             movingObject[i][0] = movingObject[i][0] +movespeed
             if movingObject[i][0] > 1024:
                 movingObject.remove(movingObject[i])
