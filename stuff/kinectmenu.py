@@ -15,6 +15,7 @@ import Xlib.ext.xtest
 
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
+# Class for bouncing animal image
 class BouncingSprite(pygame.sprite.Sprite):
 	def __init__(self, image, scrWidth, scrHeight, speed=[2,2]):
 		pygame.sprite.Sprite.__init__(self)
@@ -37,6 +38,7 @@ class BouncingSprite(pygame.sprite.Sprite):
 	def draw(self, screen):
 		screen.blit(self.image, self.rect)
 
+# Class for one menu item (welp, actually we have two menu items, but whatever)
 class MenuItem(pygame.font.Font):
 	def __init__(self, name, xpos, ypos, width, height, font, fontColor):
 		self.name = name
@@ -50,19 +52,7 @@ class MenuItem(pygame.font.Font):
 		self.itemImage = pygame.image.load("../graphics/menuico.png").convert()
 		self.itemImage.set_colorkey((255, 255, 255))
 
-	def getName(self):
-		return self.name
-
-	def getXPos(self):
-		return self.xpos
-
-	def getYPos(self):
-		return self.ypos
-
-	def changeColor(self, color):
-		self.fontColor = color
-		self.label = self.font.render(self.name, 1, color)
-
+	# Checks, if given coordinates are in object's frame
 	def isMouseSelect(self, (xpos, ypos)):
 		if(xpos >= self.xpos and xpos <= self.xpos + self.width) and \
 			(ypos >= self.ypos and ypos <= self.ypos + self.height):
@@ -70,15 +60,18 @@ class MenuItem(pygame.font.Font):
 		
 		return False
 
+	# Applies focus on actual menu item
 	def applyFocus(self, screen):
 		self.label = pygame.transform.flip(self.font.render(self.name, 1, (255, 0, 0)), 1, 0)
 		self.label = pygame.transform.smoothscale(self.label, (self.width + 25, self.height + 25))
 		screen.blit(self.itemImage, (self.xpos - 70, self.ypos + 25))
 
+	# Removes focus from actual menu item
 	def removeFocus(self):
 		self.label = pygame.transform.flip(self.font.render(self.name, 1, self.fontColor), 1, 0)
 		self.label = pygame.transform.smoothscale(self.label, (self.width, self.height))
 
+# Class for idle/game menu
 class IdleScreen():
 	def __init__(self, screen):
 		pygame.init()
@@ -100,6 +93,7 @@ class IdleScreen():
 		self.activeFocus = 0
 		self.lastActiveFocus = 1
 
+	# Creates array with menu labels ready for drawing
 	def buildMenu(self):
 		self.items = []
 
@@ -114,10 +108,12 @@ class IdleScreen():
 			mi = MenuItem(item, posx, posy, width, height, self.font, self.fontColor)
 			self.menuItems.append(mi)
 
+	# This should somehow start new game with lol.py script - SHOULD, but it doesn't
 	def startNewGame(self):
 		print "newgame"
 		sys.exit(1)
 
+	# Main loop of this script
 	def run(self):
 		screenloop = True
 		(depth,_) = get_depth()
@@ -210,6 +206,7 @@ class IdleScreen():
 			except: #There may be no centroids and therefore blobData.centroid[0] will be out of range
 				dummy = False #Waits for a new starting point
 
+	# Handles, creates and updates floating/bouncing animals in menu screen
 	def floatingPicture(self):
 		self.animalAct = None
 
