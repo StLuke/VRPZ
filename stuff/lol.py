@@ -200,6 +200,16 @@ def hand_tracker():
             if 'zbran' in data:
                 print "Menim zbran"
                 zbran = data.replace('zbran:', '')
+            if 'reset' in data:
+                score = 0
+                level = 1
+                movechance = 1
+                movechanceBad = 0.5
+                movespeed = 6
+                movespeedBad = 12
+                hasic =0
+
+                
             if ";" in data:
                 # Suradnice
                 try:
@@ -213,7 +223,7 @@ def hand_tracker():
 
         hasic +=1
 
-        if hasic % 200 == 0:
+        if hasic % 200 == 0 and level < 5:
 
             #speed of  food
             movechance *= 2
