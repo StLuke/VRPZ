@@ -176,16 +176,16 @@ class IdleScreen():
 				self.lastActiveFocus = 1
 
 
-			for cont in blobDataBack.contours: #Iterates through contours in the background
-				pygame.draw.lines(screen,(255,255,0),True,cont,3) #Colors the binary boundaries of the background yellow
+			#for cont in blobDataBack.contours: #Iterates through contours in the background
+			#	pygame.draw.lines(screen,(255,255,0),True,cont,3) #Colors the binary boundaries of the background yellow
 			for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
-				pygame.draw.circle(screen,(0,0,255),blobData.centroid[i],10) #Draws a blue circle at each centroid
+			#	pygame.draw.circle(screen,(0,0,255),blobData.centroid[i],10) #Draws a blue circle at each centroid
 				centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
-				pygame.draw.lines(screen,(255,0,0),True,blobData.cHull[i],3) #Draws the convex hull for each blob
-				pygame.draw.lines(screen,(0,255,0),True,blobData.contours[i],3) #Draws the contour of each blob
+			#	pygame.draw.lines(screen,(255,0,0),True,blobData.cHull[i],3) #Draws the convex hull for each blob
+			#	pygame.draw.lines(screen,(0,255,0),True,blobData.contours[i],3) #Draws the contour of each blob
 		
-				for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
-					pygame.draw.circle(screen,(255,0,255),tips,5) #Draws the vertices purple
+			#	for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
+			#		pygame.draw.circle(screen,(255,0,255),tips,5) #Draws the vertices purple
 
 			# Deletes depth --> opencv memory issue
 			del depth 
