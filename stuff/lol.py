@@ -108,6 +108,12 @@ address = ''
 
 
 def hand_tracker():
+
+    movechance = 1
+    movechanceBad = 0.5
+    movespeed = 6
+    movespeedBad = 12
+    hasic =0
     (depth,_) = get_depth()
     centroidList = list() #Initiate centroid list
     #RGB Color tuples
@@ -189,6 +195,11 @@ def hand_tracker():
                 sound.set_volume(1.0)
                 sound.play()
 
+                movechance = 1
+                movechanceBad = 0.5
+                movespeed = 6
+                movespeedBad = 12
+
             if 'zbran' in data:
                 print "Menim zbran"
                 zbran = data.replace('zbran:', '')
@@ -202,6 +213,18 @@ def hand_tracker():
         except Exception as e:
             pass
 
+        hasic +=1
+
+        if hasic % 100 == 0:
+
+            #speed of  food
+            movechance +=0.2
+            #speed of  junk food
+            movechanceBad = 0.2
+            #chance of food
+            movespeed +=0.3
+            #chance of junk food
+            movespeedBad +=0.3
 
         #moving object
         if random.randint(0,10000) < movechance*100:
