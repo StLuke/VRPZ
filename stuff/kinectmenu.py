@@ -105,7 +105,6 @@ class IdleScreen():
 
 		for index, item in enumerate(self.itemNames):
 			label = pygame.transform.flip(self.font.render(item, 1, self.fontColor), 1, 0)
-			#abel = self.font.render(item, 1, self.fontColor)
 			width = label.get_rect().width
 			height = label.get_rect().height + 30
 			posx = (self.scrWidth / 2) - (width / 2)
@@ -125,14 +124,6 @@ class IdleScreen():
 		cHullAreaCache = constList(5,12000) #Blank cache list for convex hull area
 		areaRatioCache = constList(5,1) #Blank cache list for the area ratio of contour area to convex hull area
 		centroidList = list() #Initiate centroid list
-		#RGB Color tuples
-		BLACK = (0,0,0)
-		RED = (255,0,0)
-		GREEN = (0,255,0)
-		PURPLE = (255,0,255)
-		BLUE = (0,0,255)
-		WHITE = (255,255,255)
-		YELLOW = (255,255,0)
 		screenFlipped = pygame.display.set_mode((self.scrWidth, self.scrHeight), 0, 32)
 		done = False #Iterator boolean --> Tells programw when to terminate
 		dummy = False #Very important bool for mouse manipulation
@@ -173,31 +164,7 @@ class IdleScreen():
 			else:
 				self.activeFocus = 0
 				self.lastActiveFocus = 1
-
-			"""
-				if item.isMouseSelect(mpos):
-					item.applyFocus(self.screen)
-				else:
-					item.removeFocus()
-			"""
-				
-
-			
-			maxTip = [0, 1000]
-			
-			for cont in blobDataBack.contours: #Iterates through contours in the background
-				pygame.draw.lines(screen,YELLOW,True,cont,3) #Colors the binary boundaries of the background yellow
-			for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
-				pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
-				centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
-				pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
-				pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
 		
-				for tips in blobData.cHull[i]: #Iterates through the verticies of the convex hull for each blob
-					if tips[1] < maxTip[1]:
-						maxTip = tips
-					#pygame.draw.circle(screen,PURPLE,tips,5) #Draws the vertices purple
-			
 			del depth #Deletes depth --> opencv memory issue
 			screenFlipped = pygame.transform.flip(screen,1,0) #Flips the screen so that it is a mirror display
 			screen.blit(screenFlipped,(0,0)) #Updates the main screen --> screen
@@ -209,11 +176,8 @@ class IdleScreen():
 				centroidY = blobData.centroid[0][1]
 				if dummy:
 					mousePtr = display.Display().screen().root.query_pointer()._data #Gets current mouse attributes
-					#displayRes = display.Display().screen().root.get_geometry()
 					dX = centroidX - strX #Finds the change in X
 					dY = strY - centroidY #Finds the change in Y
-					#print "Display Res ", displayRes
-					#print "Centroid Res ", blobData.centroid[0] 
 					print mouseX, mouseY
 					minChange = 2
 					if abs(dX) > minChange: #If there was a change in X greater than 1...
@@ -229,13 +193,7 @@ class IdleScreen():
 						elif mouseY > self.scrHeight:
 							mouseY = self.scrHeight
 					
-					#print "Mouse coords: ", mouseX, mouseY
-					#print "maxTip ", maxTip
 					move_mouse(mouseX,mouseY) #Moves mouse to new location
-					#widthHalf = displayRes.width / 2
-					#mouseX = widthHalf - (maxTip[0] - widthHalf) if maxTip[0] > widthHalf else displayRes.width - maxTip[0]
-					#mouseY = maxTip[1]
-					#move_mouse(mouseX, mouseY)
 					strX = centroidX #Makes the new starting X of mouse to current X of newest centroid
 					strY = centroidY #Makes the new starting Y of mouse to current Y of newest centroid
 					cArea = cacheAppendMean(cHullAreaCache,blobData.cHullArea[0]) #Normalizes (gets rid of noise) in the convex hull area
