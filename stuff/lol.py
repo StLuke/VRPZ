@@ -12,17 +12,16 @@ smoothing = 5
 smoothingAngle = 10
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
-bangTime = 500000000
+bangTime = 5
 #chance in %
 #speed of  food
 movechance = 1
 #speed of  junk food
-movechanceBad = 0.3
+movechanceBad = 5
 #chance of food
 movespeed = 6
 #chance of junk food
 movespeedBad = 12
-zbran = 'sheep'
 
 """
 This class is a less extensive form of regionprops() developed by MATLAB. It finds properties of contours and sets them to fields
@@ -199,13 +198,6 @@ def hand_tracker():
         except Exception as e:
             pass
 
-        #kiss kissbang bang
-        for bang in banged:
-            screen.blit(bangImg, (bang[0], bang[1]))
-            bang[2] = bang[2] + 1
-            if bang[2] > bangTime:
-                banged.remove(bang)
-                break
 
         #moving object
         if random.randint(0,10000) < movechance*100:
@@ -230,6 +222,15 @@ def hand_tracker():
 
         screen.fill(BLACK) #Make the window black
         screen.blit(wall, (0, 0))
+
+        #kiss kissbang bang
+        print banged
+        for bang in banged:
+            screen.blit(bangImg, (bang[0], bang[1]))
+            bang[2] = bang[2] + 1
+            if bang[2] > bangTime:
+                banged.remove(bang)
+                break
 
         for i in range(len(movingObject)):
             img = pygame.image.load(imgFood[movingObject[i][2]])
@@ -372,13 +373,12 @@ def hand_tracker():
             #imgZbran.get_rect().center = old_center
 
             screen.blit(imgZbran, (blobData.centroid[i][0] - int(zbranW/2), blobData.centroid[i][1] - int(zbranH/2)))
-
-            if 'sheep' in zbran:
+            if 'sheep' not in zbran:
                 for brick in range(len(movingObjectBad)):
                     if distance(movingObjectBad[brick][0], movingObjectBad[brick][1], blobData.centroid[i][0]-80, blobData.centroid[i][1]-80) < 150:
-                        movingObjectBad.remove(movingObjectBad[brick])
                         slash.play()
                         banged.append([movingObjectBad[brick][0], movingObjectBad[brick][1], 0])
+                        movingObjectBad.remove(movingObjectBad[brick])
                         break
 
         pygame.display.set_caption('ZOO') #Makes the caption of the pygame screen 'Kinect Tracking'
