@@ -29,47 +29,34 @@ ApplicationWindow {
         ListElement {
             name: "Bizon"
             soubor: "bison.png"
-            url: "http://img2.wikia.nocookie.net/__cb20120812082359/adventuretimewithfinnandjake/images/0/06/Pig_trans.png"
         }
         ListElement {
             name: "Darth Vader"
             soubor: "vader.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
-        }
-        ListElement {
-            name: "Kráva"
-            soubor: "cow.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
         }
         ListElement {
             name: "Slon"
             soubor: "elephant.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
         }
         ListElement {
             name: "Žirafa"
             soubor: "giraffe.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
         }
         ListElement {
             name: "Koza"
             soubor: "goat.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
         }
         ListElement {
             name: "Lev"
             soubor: "lion.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
         }
         ListElement {
             name: "Opice"
             soubor: "monkey.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
         }
         ListElement {
             name: "Ovce"
             soubor: "sheep.png"
-            url: "http://i.ytimg.com/vi/kvSrg8qT0hY/hqdefault.jpg"
         }
     }
 
@@ -77,9 +64,28 @@ ApplicationWindow {
     ListModel {
         id: zbraneModel
         ListElement {
-            name: "Světelný meč"
-            soubor: "lightsaber.png"
-            url: "http://a.tgcdn.net/images/products/frontsquare/b72c_star_wars_lightsaber_single.jpg"
+            soubor: "bison_weapon.png"
+        }
+        ListElement {
+            soubor: "vader_weapon.png"
+        }
+        ListElement {
+            soubor: "elephant_weapon.png"
+        }
+        ListElement {
+            soubor: "giraffe_weapon.png"
+        }
+        ListElement {
+            soubor: "goat_weapon.png"
+        }
+        ListElement {
+            soubor: "lion_weapon.png"
+        }
+        ListElement {
+            soubor: "monkey_weapon.png"
+        }
+        ListElement {
+            soubor: "sheep_weapon.png"
         }
     }
 
@@ -253,7 +259,7 @@ ApplicationWindow {
                         anchors.fill: parent
                         anchors.margins: 4
                         id: zvireKsicht
-                        source: url
+                        source: soubor
                     }
 
                     color: "transparent"
@@ -286,7 +292,7 @@ ApplicationWindow {
                         anchors.fill: parent
                         anchors.margins: 4
                         id: zbranObrazek
-                        source: url
+                        source: soubor
                     }
 
                     color: "transparent"
