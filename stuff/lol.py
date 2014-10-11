@@ -10,6 +10,7 @@ import random
 
 smoothing = 5
 smoothingAngle = 10
+smoothingCriminal = 10
 constList = lambda length, val: [val for _ in range(length)] #Gives a list of size length filled with the variable val. length is a list and val is dynamic
 
 score = 0
@@ -143,6 +144,7 @@ def hand_tracker():
     imgCow = pygame.transform.scale(imgCow, (int(cowW * scale), int(cowH * scale)))
     smoothVector = list()
     smoothAngle = list()
+    smoothCriminal = list()
 
     movingObject = list()
     movingObjectBad = list()
@@ -214,6 +216,7 @@ def hand_tracker():
                     accX,accY,accZ = data.split(';')
                 except Exception as e:
                     print "Suradnice: ", e
+
 
         except Exception as e:
             pass
@@ -366,8 +369,20 @@ def hand_tracker():
         for i in range(blobData.counter): #Iterate from 0 to the number of blobs minus 1
 
             #pygame.draw.circle(screen,BLUE,blobData.centroid[i],10) #Draws a blue circle at each centroid
+            smoothCriminal.append(blobData.centroid[i])
 
-            centroidList.append(blobData.centroid[i]) #Adds the centroid tuple to the centroidList --> used for drawing
+            if len(smoothCriminal) > smoothingCriminal:
+                smoothCriminal.pop(0)
+
+            mean = [0, 0]
+            for val in smoothCriminal:
+                mean[0] = mean[0]+val[0]
+                mean[1] = mean[1]+val[1]
+
+            mean[0]=int(mean[0]/len(smoothCriminal))
+            mean[1]=int(mean[1]/len(smoothCriminal))
+
+            centroidList.append((mean[0], mean[1])) #Adds the centroid tuple to the centroidList --> used for drawing
             #pygame.draw.lines(screen,RED,True,blobData.cHull[i],3) #Draws the convex hull for each blob
             #pygame.draw.lines(screen,GREEN,True,blobData.contours[i],3) #Draws the contour of each blob
             mostLeft = (xSize, 0)
