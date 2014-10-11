@@ -5,6 +5,7 @@ import pygame #Uses pygame
 import sys
 import time
 import random
+import os
 
 #The libaries below are used for mouse manipulation
 from Xlib import X, display
@@ -87,7 +88,7 @@ class IdleScreen():
 		self.bgColor = (0, 0, 0)
 		self.bgImage = pygame.transform.flip(pygame.image.load("../graphics/mainbg.jpg").convert(), 1, 0)
 		self.clock = pygame.time.Clock()
-		self.font = pygame.font.SysFont("Comic Sans MS", 65)
+		self.font = pygame.font.SysFont("LDFComicSans", 60)
 		self.fontColor = (255, 255, 255)
 		self.menuItems = list()
 		self.itemNames = ("New game", "Quit")
@@ -113,7 +114,7 @@ class IdleScreen():
 			self.menuItems.append(mi)
 
 	def startNewGame(self):
-		print "THERE SHOULD BE SOMETHING"
+		sys.exit(1)
 
 	def run(self):
 		screenloop = True
@@ -153,7 +154,7 @@ class IdleScreen():
 				elif e.type == pygame.MOUSEBUTTONDOWN:
 					for item in self.menuItems:
 						if item.isMouseSelect(mpos):
-							self.menuFuncs[item.name]()
+							screenloop = self.menuFuncs[item.name]()
 							break;
 
 			self.screen.blit(self.bgImage, (0, 0))
@@ -199,27 +200,28 @@ class IdleScreen():
 					dY = strY - centroidY #Finds the change in Y
 					#print "Display Res ", displayRes
 					#print "Centroid Res ", blobData.centroid[0] 
+					
 					minChange = 6
 					if abs(dX) > minChange: #If there was a change in X greater than 1...
 						mouseX = mousePtr["root_x"] - 2*dX #New X coordinate of mouse
-						#mouseX = maxTip[0]
 						if mouseX < 0:
 							mouseX = 0
 						elif mouseX > self.scrWidth:
 							mouseX = self.scrWidth
 					if abs(dY) > minChange: #If there was a change in Y greater than 1...
 						mouseY = mousePtr["root_y"] - 2*dY #New Y coordinate of mouse
-						#mouseY = maxTip[1]
 						if mouseY < 0:
 							mouseY = 0
 						elif mouseY > self.scrHeight:
 							mouseY = self.scrHeight
-					print "Mouse coords: ", mouseX, mouseY
+				
+					#print "Mouse coords: ", mouseX, mouseY
 					#print "maxTip ", maxTip
 					move_mouse(mouseX,mouseY) #Moves mouse to new location
-					#widthHalf = displayRes / 2
-					#mouseX = widthHalf - (maxTip[0] - widthHalf) if maxTip[0] < widthHalf else displayRes.width - maxTip[0]
-					#move_mouse(mouseX, maxTip[1])
+					#widthHalf = displayRes.width / 2
+					#mouseX = widthHalf - (maxTip[0] - widthHalf) if maxTip[0] > widthHalf else displayRes.width - maxTip[0]
+					#mouseY = maxTip[1]
+					#move_mouse(mouseX, mouseY)
 					strX = centroidX #Makes the new starting X of mouse to current X of newest centroid
 					strY = centroidY #Makes the new starting Y of mouse to current Y of newest centroid
 					cArea = cacheAppendMean(cHullAreaCache,blobData.cHullArea[0]) #Normalizes (gets rid of noise) in the convex hull area
@@ -296,6 +298,7 @@ class BlobAnalysis:
 
 d = display.Display() #Display reference for Xlib manipulation
 def move_mouse(x,y):#Moves the mouse to (x,y). x and y are ints
+	print "Moving mouse to: ", x, y
 	s = d.screen()
 	root = s.root
 	root.warp_pointer(x,y)

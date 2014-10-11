@@ -105,7 +105,7 @@ ApplicationWindow {
             title: qsTr("Game")
             MenuItem {
                 text: qsTr("Reset")
-                onTriggered: uvod.show()
+                onTriggered: vyber.show()
             }
 
             MenuItem {
@@ -145,8 +145,7 @@ ApplicationWindow {
                 x = -content.width
             }
             function show() {
-                mody.hide()
-                fight.hide()
+                vyber.hide()
                 x = 0
             }
 
@@ -232,7 +231,6 @@ ApplicationWindow {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            avatary.show()
                         }
                     }
                 }
@@ -298,9 +296,6 @@ ApplicationWindow {
                         anchors.fill: parent
                         onClicked: {
                             dataReader.sendPacket("zbran:"+soubor)
-                            fight.show()
-                            dataReader.sendPacket("fight")
-                            dataReader.startFight()
                         }
                     }
                 }
@@ -321,37 +316,13 @@ ApplicationWindow {
                     text: "START"
                     font.pointSize: 36
                 }
-            }
-        }
-
-        Rectangle {
-            color: "transparent"
-            clip: true
-            id: fight
-            x: parent.width
-            y: 0
-            width: parent.width
-            height: parent.height
-            function hide() {
-                x = -content.width
-            }
-            function show() {
-                uvod.hide()
-                vyber.hide()
-                x = 0
-            }
-            Behavior on x {
-                NumberAnimation {
-                    duration: 200
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        dataReader.sendPacket("fight")
+                        dataReader.startFight()
+                    }
                 }
-            }
-
-            Text {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                horizontalAlignment: Text.AlignHCenter
-                font.pointSize: 32
-                text: "FIIIGHT!"
             }
         }
     }
