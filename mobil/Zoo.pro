@@ -5,7 +5,8 @@ QT += qml quick widgets sensors svg xml network
 SOURCES += main.cpp \
     datareader.cpp
 
-RESOURCES += qml.qrc
+RESOURCES += qml.qrc \
+             ../graphics/graphics.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
