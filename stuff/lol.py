@@ -14,9 +14,9 @@ constList = lambda length, val: [val for _ in range(length)] #Gives a list of si
 
 #chance in %
 #speed of  food
-movechance = 2
+movechance = 1
 #speed of  junk food
-movechanceBad = 0.7
+movechanceBad = 0.3
 #chance of food
 movespeed = 6
 #chance of junk food
