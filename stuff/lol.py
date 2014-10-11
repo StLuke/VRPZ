@@ -131,6 +131,16 @@ def hand_tracker():
     WIDTH,HEIGHT = xSize,ySize
     screen = pygame.display.set_mode((xSize,ySize),pygame.RESIZABLE) #creates main surface
     screenFlipped = pygame.display.set_mode((xSize,ySize),pygame.RESIZABLE) #creates surface that will be flipped (mirror display)
+
+    trex1Img = pygame.image.load('../graphics/trex1.png')
+    trex2Img = pygame.image.load('../graphics/trex2.png')
+    trex3Img = pygame.image.load('../graphics/trex3.png')
+    trexW, trexH = 200, 210
+    trexMaxW, trexMaxH = trex1Img.get_size()
+    trexCoord = [-200, 300]
+    trex = False
+
+
     screen.fill(BLACK) #Make the window black
     done = False #Iterator boolean --> Tells programw when to terminate
 
@@ -165,8 +175,6 @@ def hand_tracker():
     accY = 0
     accZ = 0
 
-    head = [0, 10000]
-
     pygame.mixer.init()
     sound = pygame.mixer.Sound('../sound/' + sys.argv[1]+'.wav')
     crunch = pygame.mixer.Sound('../sound/crunch.wav')
@@ -181,7 +189,7 @@ def hand_tracker():
     while not done:
         try:
             data,address = s.recvfrom(10000)
-            print "recv:", data, " from:", address
+            #print "recv:", data, " from:", address
             if data == "ping":
                 s.sendto("ready", address)
             if 'ksicht' in data:
@@ -208,8 +216,8 @@ def hand_tracker():
                 movespeed = 6
                 movespeedBad = 12
                 hasic =0
-
-                
+            if 'bonus' in data:
+                trex = True
             if ";" in data:
                 # Suradnice
                 try:
@@ -236,7 +244,7 @@ def hand_tracker():
             level += 1
 
         #moving object
-        if random.randint(0,10000) < movechance*100:
+        if random.randint(0,10000) < movechance*100 and not trex:
             down, up = 1, 5
             if headPic == 'lion' or headPic == 'vader':
                 down = 0
@@ -247,7 +255,7 @@ def hand_tracker():
                 movingObject.append([0, moveCordY, food, 1])
             else:
                 movingObject.append([1024, moveCordY, food, -1])
-        if random.randint(0,10000) < movechanceBad*100:
+        if random.randint(0,10000) < movechanceBad*100 and not trex:
             candy = random.randint(0,3)
             moveCordY = random.randint(0, 384)
             orientation = random.randint(0,1)
@@ -263,6 +271,24 @@ def hand_tracker():
         label = myfont.render("Level: "+ str(level)+"       Score: " + str(score), 1, BLACK)
         label = pygame.transform.flip(label,1,0)
         screen.blit(label, (264, 50))
+
+        # TREX BONUS!
+        if trex:
+            if trexCoord[0] > 240:
+                screen.blit(trex3Img, trexCoord)
+            else:
+                trexCoord[0] += 1
+                if trexW < trexMaxW:
+                    trexW += 1
+                if trexH < trexMaxH:
+                    trexH += 1
+
+                if hasic % 17 < 8:
+                    trexOut = pygame.transform.scale(trex1Img, (trexW, trexH))
+                else:
+                    trexOut = pygame.transform.scale(trex2Img, (trexW, trexH))
+
+                screen.blit(trexOut, trexCoord)
 
         #kiss kissbang bang
         for bang in banged:
@@ -399,12 +425,22 @@ def hand_tracker():
 
 
             if blobData.centroid[i][0] > headCords[0]:
-                continue
+                #continue
+                pass
+
             # Centrum ruky
             #pygame.draw.circle(screen,WHITE,blobData.centroid[i],10)
-           # pygame.draw.circle(screen,RED,(blobData.centroid[i][0]-80,blobData.centroid[i][1]-80),10)
+            # pygame.draw.circle(screen,RED,(blobData.centroid[i][0]-80,blobData.centroid[i][1]-80),10)
+
             imgZbran = pygame.image.load('../graphics/' + zbran)
             zbranW, zbranH = imgZbran.get_size()
+
+            # Hit trex?
+            if trex:
+                if (blobData.centroid[i][0] - int(zbranW/2)) < (trexCoord[0] + trexMaxW/2) and (blobData.centroid[i][1] > trexCoord[1]):
+                    screen.blit(bangImg, (trexCoord[0] + trexMaxW/2, blobData.centroid[i][1] - 150))
+
+
 
             #old_center = imgZbran.get_rect().center
             #imgZbran = pygame.transform.rotate(imgZbran, (float(accX) + 90) * -1)
