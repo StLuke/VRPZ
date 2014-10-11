@@ -15,12 +15,7 @@ ApplicationWindow {
     ListModel {
         id: modyModel
         ListElement {
-            url: "http://icons.iconarchive.com/icons/icons8/windows-8/512/Military-Sword-icon.png"
-            name: "Sám proti přírodě"
-        }
-        ListElement {
-            url: "https://cdn3.iconfinder.com/data/icons/ahasoft-war/512/guard-512.png"
-            name: "Zápas"
+            soubor: "food0.png"
         }
     }
 
@@ -123,7 +118,7 @@ ApplicationWindow {
 
     Image {
         anchors.fill: parent
-        source: "http://picturesforcoloring.com/wp-content/uploads/2012/05/jungle-wallpaper.jpg"
+        source: "mainbg.jpg"
         fillMode: Image.PreserveAspectCrop
         Rectangle {
             anchors.fill: parent
@@ -171,7 +166,7 @@ ApplicationWindow {
                     property int clicked: 0
                     onClicked: {
                         clicked++
-                        if (clicked == 5) {
+                        if (clicked == 3) {
                             vyber.show()
                             clicked = 0
                         }
@@ -185,7 +180,7 @@ ApplicationWindow {
                 anchors.bottomMargin: 128
                 horizontalAlignment: Text.AlignHCenter
                 color: "#444444"
-                text: "Hodí se poznamenat,\nže menu se dá prolézt i když je server off\ntím, že člověk 5x poklepe na displej...\nAkorát to nebude nic dělat, OFC"
+                text: "Hodí se poznamenat,\nže menu se dá prolézt i když je server off\ntím, že člověk 3x poklepe na displej...\nAkorát to nebude nic dělat, OFC"
             }
         }
 
@@ -211,7 +206,7 @@ ApplicationWindow {
 
             Text {
                 id: vyberText
-                text: "OFC"
+                height: 0
             }
 
             ListView {
@@ -231,7 +226,7 @@ ApplicationWindow {
                     Image {
                         id: nabidkaObrazek
                         anchors.fill: parent
-                        source:url
+                        source:soubor
                         width: height
                     }
                     MouseArea {
@@ -293,6 +288,8 @@ ApplicationWindow {
                         anchors.margins: 4
                         id: zbranObrazek
                         source: soubor
+                        scale: 2
+                        transform: Translate { x: -(parent.width/2) }
                     }
 
                     color: "transparent"
