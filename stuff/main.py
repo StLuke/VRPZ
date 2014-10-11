@@ -12,7 +12,8 @@ class BouncingSprite(pygame.sprite.Sprite):
 		self.speed = speed
 		self.image = pygame.image.load(image)
 		self.rect = self.image.get_rect()
-		self.rect.move_ip(random.randint(0, scrWidth - self.rect.x), random.randint(0, scrHeight - self.rect.y))
+		print self.rect
+		self.rect.move_ip(random.randint(0, scrWidth - self.rect.width), random.randint(0, scrHeight - self.rect.height - 1))
 		self.scrWidth = scrWidth
 		self.scrHeight = scrHeight
 
@@ -82,13 +83,9 @@ class IdleScreen():
 		self.itemNames = ("New game", "Quit")
 		self.menuFuncs = { 	"New game" : self.startNewGame,
 							"Quit" : sys.exit}
-		self.animalX = 0
-		self.animalY = self.scrHeight - 250
-		self.animalAct = None
-		self.animalImg = None
-		self.animalAngle = 0
-		self.animalPictures = ("bison.png", "cow.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
-								"monkey.png", "sheep.png", "vader.png")
+		self.animalImgs = []
+		self.animalPictures = ("bison.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
+								"monkey.png", "sheep.png")
 
 	def buildMenu(self):
 		self.items = []
@@ -137,15 +134,18 @@ class IdleScreen():
 			pygame.display.flip()
 
 	def floatingPicture(self):
-		if self.animalImg == None:
-			self.animalAct = random.choice(self.animalPictures)
-			self.animalImg = BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [5, 5])
-			self.animalX = -50;
+		self.animalAct = None
+
+		if self.animalImgs == []:
+			for i in range(0, 3):
+				self.animalAct = self.animalPictures[random.randrange(len(self.animalPictures))]
+				self.animalImgs.append(BouncingSprite("../graphics/" + self.animalAct, self.scrWidth, self.scrHeight, [3, 3]))
 		else:
-			self.animalImg.update()
+			for img in self.animalImgs:
+				img.update()
 
-
-		self.animalImg.draw(self.screen)
+		for img in self.animalImgs:
+			img.draw(self.screen)
 
 
 if __name__ == "__main__":
