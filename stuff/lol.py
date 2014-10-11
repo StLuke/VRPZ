@@ -299,8 +299,8 @@ def hand_tracker():
                 crunch.play()
                 break
 
-         for i in range(len(movingObjectBad)):
-            if distance(movingObjecBadt[i][0], movingObjectBad[i][1], headCords[0], headCords[1]) < 75:
+        for i in range(len(movingObjectBad)):
+            if distance(movingObjectBad[i][0], movingObjectBad[i][1], headCords[0], headCords[1]) < 75:
                 movingObjectBad.remove(movingObjectBad[i])
                 buzzer.play()
                 break
