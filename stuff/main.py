@@ -11,8 +11,6 @@ class BouncingSprite(pygame.sprite.Sprite):
 		pygame.sprite.Sprite.__init__(self)
 		self.speed = speed
 		self.image = pygame.image.load(image)
-		pygame.sprite.LayeredUpdates.move_to_back(self)
-		move_to_back(self.image)
 		self.rect = self.image.get_rect()
 		self.rect.move_ip(random.randint(0, scrWidth - self.rect.x), random.randint(0, scrHeight - self.rect.y))
 		self.scrWidth = scrWidth
@@ -92,7 +90,7 @@ class IdleScreen():
 		self.animalPictures = ("bison.png", "cow.png", "elephant.png", "giraffe.png", "goat.png", "lion.png",
 								"monkey.png", "sheep.png", "vader.png")
 
-	def drawMenu(self):
+	def buildMenu(self):
 		self.items = []
 
 		for index, item in enumerate(self.itemNames):
@@ -110,12 +108,11 @@ class IdleScreen():
 		print "THERE SHOULD BE SOMETHING"
 
 	def run(self):
+		self.buildMenu()
 		screenloop = True
 		while screenloop:
 			self.clock.tick(30)
 			mpos = pygame.mouse.get_pos() 
-
-			self.drawMenu()
 
 			for e in pygame.event.get():
 				if e.type == pygame.QUIT:
@@ -127,6 +124,7 @@ class IdleScreen():
 							break;
 
 			self.screen.blit(self.bgImage, (0, 0))
+			self.floatingPicture()
 
 			for item in self.menuItems:
 				if item.isMouseSelect(mpos):
@@ -136,7 +134,6 @@ class IdleScreen():
 
 				self.screen.blit(item.label, (item.xpos, item.ypos))
 
-			self.floatingPicture()
 			pygame.display.flip()
 
 	def floatingPicture(self):
