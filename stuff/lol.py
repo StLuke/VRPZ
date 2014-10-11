@@ -17,7 +17,7 @@ bangTime = 5
 #speed of  food
 movechance = 1
 #speed of  junk food
-movechanceBad = 5
+movechanceBad = 0.3
 #chance of food
 movespeed = 6
 #chance of junk food
@@ -225,7 +225,6 @@ def hand_tracker():
         screen.blit(wall, (0, 0))
 
         #kiss kissbang bang
-        print banged
         for bang in banged:
             screen.blit(bangImg, (bang[0], bang[1]))
             bang[2] = bang[2] + 1
