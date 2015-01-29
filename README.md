@@ -1,3 +1,3 @@
 VRPZ
 ====
-Fight & Fuck zoo
+Interactive display for kids on ZOO
